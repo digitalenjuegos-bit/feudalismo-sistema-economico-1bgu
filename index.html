@@ -122,6 +122,7 @@
             opacity: 0.7;
         }
         .docente-boton-inicio {
+            display: none;
             margin-top: 10px;
         }
         #panel-juego { padding: 10px 0; }
@@ -369,6 +370,7 @@
 
         /* Enlace docente fijo */
         .docente-link {
+            display: none;
             position: fixed;
             bottom: 15px;
             right: 20px;
@@ -1441,6 +1443,14 @@
         if (btnPanelInicio) {
             btnPanelInicio.addEventListener('click', abrirPanelDocente);
         }
+
+        // Acceso docente oculto: ALT+SHIFT+D
+        document.addEventListener('keydown', function(e) {
+            if (e.altKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+                e.preventDefault();
+                abrirPanelDocente();
+            }
+        });
 
         btnCerrarModal.addEventListener('click', function() { modalDocente.classList.remove('show'); });
         modalDocente.addEventListener('click', function(e) { if (e.target === modalDocente) modalDocente.classList.remove('show'); });
