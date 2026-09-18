@@ -355,6 +355,15 @@
             margin: 20px 0;
         }
         .result-stats div { background: #f5f0e8; padding: 12px 24px; border-radius: 40px; border: 1px solid #c9a96e; }
+        .result-stats div.penalidad-stat { background: #fdf0f0; border-color: #d4a0a0; }
+        #toast-penalidad {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #7a1f1f; color: #fff; padding: 12px 24px; border-radius: 40px;
+            font-weight: 700; font-size: 1rem; z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        #toast-penalidad.show { opacity: 1; }
         .result-actions {
             display: flex;
             justify-content: center;
@@ -525,6 +534,7 @@
                     <div>❌ Errores: <strong id="r-errores">0</strong></div>
                     <div>⏱️ Bonos: <strong id="r-bonos">0</strong></div>
                     <div>🏅 Puntos: <strong id="r-puntos">0</strong></div>
+                    <div class="penalidad-stat">⚠️ Penalidades: <strong id="r-penalidades">0</strong></div>
                 </div>
                 <div class="result-actions">
                     <button class="btn btn-gold" id="btn-descargar-resultados">📥 Descargar resultados (PDF)</button>
@@ -797,7 +807,7 @@
         let estado = {
             nombre: '', curso: '', posicion: 1,
             casillasSuperadas: new Array(TOTAL_CASILLAS+1).fill(false),
-            puntos: 0, aciertos: 0, errores: 0, bonosTiempo: 0,
+            puntos: 0, aciertos: 0, errores: 0, bonosTiempo: 0, penalidades: 0,
             partidaTerminada: false, dadoActual: 0, enPregunta: false,
             cronometro: null, tiempoPregunta: 0, preguntaActualIndex: -1,
             respuestaBloqueada: false, historial: [], preguntasPartida: [],
@@ -813,7 +823,7 @@
         const tablero = $('tablero'), casillaActual = $('casilla-actual'), puntosActual = $('puntos-actual'), aciertosSpan = $('aciertos'), erroresSpan = $('errores');
         const btnTirar = $('btn-tirar'), dadoDiv = $('dado'), preguntaContenido = $('pregunta-contenido'), btnVolverInicio = $('btn-volver-inicio');
         const popupOverlay = $('popup-pregunta'), popupContenido = $('popup-contenido'), popupTimer = $('popup-timer');
-        const notaFinal = $('nota-final'), mensajeFinal = $('mensaje-final'), rAciertos = $('r-aciertos'), rErrores = $('r-errores'), rBonos = $('r-bonos'), rPuntos = $('r-puntos');
+        const notaFinal = $('nota-final'), mensajeFinal = $('mensaje-final'), rAciertos = $('r-aciertos'), rErrores = $('r-errores'), rBonos = $('r-bonos'), rPuntos = $('r-puntos'), rPenalidades = $('r-penalidades');
         const btnReintentar = $('btn-reintentar'), btnDescargar = $('btn-descargar-resultados');
         const docenteLink = $('docente-link'), btnCerrarModal = $('cerrar-modal'), claveDocente = $('clave-docente'), btnValidarClave = $('btn-validar-clave');
         const contenidoDocente = $('contenido-docente'), cuerpoReportes = $('cuerpo-reportes'), totalRegistros = $('total-registros');
@@ -1097,10 +1107,11 @@
             estado.erroresTransformados = erroresTransformados;
             const total = estado.aciertos+estado.errores;
             const nota = (estado.aciertos/total)*10;
+            estado.penalidades = 0;
             notaFinal.textContent = nota.toFixed(1);
             guardarReporte(estado.nombre, estado.curso, nota, estado.aciertos, estado.errores, estado.puntos, erroresTransformados);
             mostrarPanel(panelResultado);
-            rAciertos.textContent=estado.aciertos; rErrores.textContent=estado.errores; rBonos.textContent=estado.bonosTiempo; rPuntos.textContent=estado.puntos;
+            rAciertos.textContent=estado.aciertos; rErrores.textContent=estado.errores; rBonos.textContent=estado.bonosTiempo; rPuntos.textContent=estado.puntos; rPenalidades.textContent=estado.penalidades;
             mensajeFinal.textContent = '🧪 Prueba de envío. Resultados simulados.';
             enviarResultadosAFormspree();
         }
@@ -1114,6 +1125,12 @@
             let nota = 0;
             if (totalRespuestas > 0) nota = (estado.aciertos / totalRespuestas) * 10;
             nota = Math.round(nota * 10) / 10;
+
+            // Penalidad por salidas de pantalla: -0.5 por cada vez (mínimo 0)
+            if (estado.penalidades > 0) {
+                nota = Math.max(0, nota - estado.penalidades);
+                nota = Math.round(nota * 10) / 10;
+            }
             
             // Transformar errores al formato esperado y guardarlos en el estado
             const erroresTransformados = estado.historial.filter(h=>!h.correcta).map(h=>({
@@ -1132,11 +1149,38 @@
             rErrores.textContent = estado.errores;
             rBonos.textContent = estado.bonosTiempo;
             rPuntos.textContent = estado.puntos;
+            rPenalidades.textContent = estado.penalidades;
             if (nota >= 7) mensajeFinal.textContent = '🎉 ¡Excelente! Has comprendido el equilibrio económico feudal.';
             else if (nota >= 5) mensajeFinal.textContent = '📖 Buen trabajo, pero puedes profundizar más. Revisa la matriz comparativa.';
             else mensajeFinal.textContent = '📚 Vuelve a estudiar el contenido y prueba de nuevo. ¡Ánimo!';
+            if (estado.penalidades > 0) mensajeFinal.textContent += ' ⚠️ Se restaron ' + estado.penalidades.toFixed(1) + ' puntos por salidas de pantalla.';
             setTimeout(() => enviarResultadosAFormspree(), 500);
         }
+
+        // ============================================================
+        // PENALIDAD POR SALIDA DE PANTALLA (-0.5 por cada vez)
+        // ============================================================
+        function mostrarToastPenalidad() {
+            let toast = document.getElementById('toast-penalidad');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-penalidad';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = '⚠️ Penalidad -0.5 por cambiar de ventana · Total: -' + estado.penalidades.toFixed(1);
+            toast.classList.add('show');
+            clearTimeout(mostrarToastPenalidad._t);
+            mostrarToastPenalidad._t = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.addEventListener('visibilitychange', function() {
+            if (estado.partidaTerminada || !panelJuego.classList.contains('active')) return;
+            if (document.hidden) {
+                estado.penalidades += 0.5;
+            } else {
+                mostrarToastPenalidad();
+            }
+        });
 
         // ============================================================
         // GUARDADO DE REPORTE (con historial de errores transformado)
@@ -1145,6 +1189,7 @@
             let reportes = JSON.parse(localStorage.getItem('reportesFeudalismo') || '[]');
             reportes.push({
                 nombre, curso, nota, aciertos, errores, puntos,
+                penalidades: estado.penalidades || 0,
                 fecha: new Date().toLocaleString(),
                 historialErrores: historialErrores || []  // array de {pregunta, tu_respuesta, respuesta_correcta}
             });
@@ -1358,7 +1403,7 @@
             estado.preguntasPartida = shuffleArray([...PREGUNTAS_BASE]);
             estado.posicion = 1;
             estado.casillasSuperadas = new Array(TOTAL_CASILLAS+1).fill(false);
-            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0;
+            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0; estado.penalidades = 0;
             estado.partidaTerminada = false; estado.enPregunta = false; estado.dadoActual = 0;
             estado.respuestaBloqueada = false; estado.historial = [];
             estado.erroresTransformados = []; // limpiar también
@@ -1425,7 +1470,7 @@
             this.classList.remove('ring-2', 'ring-red-300');
             detenerCronometro(); popupOverlay.classList.remove('show');
             estado.posicion = 1; estado.casillasSuperadas = new Array(TOTAL_CASILLAS+1).fill(false);
-            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0;
+            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0; estado.penalidades = 0;
             estado.partidaTerminada = false; estado.enPregunta = false; estado.historial = [];
             estado.erroresTransformados = [];
             actualizarStats(); actualizarTablero();
