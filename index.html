@@ -121,10 +121,6 @@
             padding-top: 15px;
             opacity: 0.7;
         }
-        .docente-boton-inicio {
-            display: none;
-            margin-top: 10px;
-        }
         #panel-juego { padding: 10px 0; }
         .game-top {
             display: flex;
@@ -368,25 +364,27 @@
         }
         .result-actions .btn { min-width: 180px; }
 
-        /* Enlace docente fijo */
+        /* Punto de acceso docente (discreto, solo para el docente) */
         .docente-link {
-            display: none;
+            display: block;
             position: fixed;
-            bottom: 15px;
-            right: 20px;
-            font-size: 0.7rem;
-            color: #8f8a7a;
-            text-decoration: none;
-            background: rgba(255,248,235,0.6);
-            padding: 4px 12px;
-            border-radius: 30px;
-            border: 1px solid #c9a96e;
+            bottom: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(201,169,110,0.25);
+            border: 1px solid rgba(201,169,110,0.35);
+            opacity: 0.35;
             cursor: pointer;
-            transition: 0.2s;
+            transition: opacity 0.2s, background 0.2s;
             z-index: 50;
-            font-family: 'Roboto', sans-serif;
         }
-        .docente-link:hover { background: #c9a96e; color: #1f160e; }
+        .docente-link:hover {
+            opacity: 1;
+            background: rgba(201,169,110,0.6);
+            border-color: #c9a96e;
+        }
 
         /* Modal docente */
         .modal-overlay {
@@ -446,8 +444,8 @@
     </style>
 </head>
 <body>
-    <!-- Enlace fijo a panel docente -->
-    <div class="docente-link" id="docente-link">🔑 Docente</div>
+    <!-- Punto de acceso docente (discreto) -->
+    <div class="docente-link" id="docente-link"></div>
 
     <div class="game-container" id="app">
         <!-- PANEL INICIO -->
@@ -483,10 +481,6 @@
                 <button class="btn btn-gold" id="btn-comenzar">⚡ Comenzar</button>
             </div>
             <div id="mensaje-error" style="color:#b13e3e; font-weight:bold; margin-top:10px;"></div>
-            <!-- Botón panel docente visible -->
-            <div class="docente-boton-inicio">
-                <button class="btn" id="btn-panel-docente-inicio" style="background:#5a4a32; padding:8px 20px; font-size:0.9rem;">👨‍🏫 Panel Docente</button>
-            </div>
             <div class="copyright">© 2026 · Elaborado por Mr. Alberto Ottati R.</div>
         </div>
 
@@ -1458,10 +1452,6 @@
         }
 
         docenteLink.addEventListener('click', abrirPanelDocente);
-        const btnPanelInicio = document.getElementById('btn-panel-docente-inicio');
-        if (btnPanelInicio) {
-            btnPanelInicio.addEventListener('click', abrirPanelDocente);
-        }
 
         // Acceso docente oculto: ALT+SHIFT+D
         document.addEventListener('keydown', function(e) {
