@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Feudalismo como Sistema Económico · 1BGU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        /* ============================================================
+           ESTILOS DEL JUEGO (COMPLETOS)
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 1300px;
+            width: 100%;
+            background: #f5f0e8;
+            background-image: radial-gradient(circle at 10% 20%, #fdfaf3 0%, #e8e0d5 90%);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border: 4px solid #c9a96e;
+            position: relative;
+            overflow: hidden;
+        }
+        .game-container::before {
+            content: "";
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M20 20 L80 20 L80 80 L20 80 Z" stroke="%23b08d4b" stroke-width="2" fill="none"/><circle cx="50" cy="50" r="10" stroke="%23b08d4b" stroke-width="1.5" fill="none"/></svg>');
+            pointer-events: none;
+        }
+        .panel { display: none; position: relative; z-index: 2; animation: fadeIn 0.5s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        h1, h2, h3 { font-family: 'Cinzel', serif; color: #3a2c1b; letter-spacing: 1px; }
+        .gold-text { color: #b08d4b; }
+        .btn {
+            background: #3a2c1b;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: #f5f0e8;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #1f160e;
+            letter-spacing: 1px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #1f160e; background: #4d3b25; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1f160e; }
+        .btn-gold { background: #c9a96e; color: #1f160e; box-shadow: 0 4px 0 #8f7642; }
+        .btn-gold:hover { background: #dbb87a; }
+        .btn-test { background: #2d6a9f; color: #fff; box-shadow: 0 4px 0 #1a3f6a; }
+        .btn-test:hover { background: #3a7fbf; }
+        .btn-danger { background: #b13e3e; box-shadow: 0 4px 0 #6f2525; }
+        .btn-danger:hover { background: #c94a4a; }
+        .btn-sm { padding: 6px 16px; font-size: 0.8rem; }
+        .input-field {
+            padding: 12px 18px;
+            border-radius: 30px;
+            border: 2px solid #c9a96e;
+            font-size: 1rem;
+            background: #fefcf7;
+            width: 100%;
+            max-width: 300px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .input-field:focus { outline: none; border-color: #8f7642; box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.3); }
+        select.input-field {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a2c1b' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 12px;
+        }
+        #panel-inicio { text-align: center; }
+        .inicio-header { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .inicio-title { font-size: 2.5rem; font-weight: 900; text-shadow: 2px 2px 0 #d4c3a0; }
+        .inicio-sub { font-size: 1.1rem; color: #3a2c1b; max-width: 700px; margin: 10px auto; line-height: 1.6; }
+        .reglas-box {
+            background: rgba(255, 248, 235, 0.7);
+            border: 2px solid #c9a96e;
+            border-radius: 30px;
+            padding: 25px;
+            margin: 25px auto;
+            max-width: 700px;
+            text-align: left;
+        }
+        .reglas-box ul { list-style: none; padding: 0; }
+        .reglas-box li {
+            padding: 8px 0 8px 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="%23c9a96e"/></svg>') left center no-repeat;
+            background-size: 16px;
+            margin-bottom: 4px;
+        }
+        .registro { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin: 30px 0 20px; }
+        .registro .input-field { max-width: 250px; }
+        .copyright {
+            font-size: 0.8rem;
+            color: #5a4a32;
+            margin-top: 20px;
+            font-style: italic;
+            border-top: 1px solid #c9a96e;
+            padding-top: 15px;
+            opacity: 0.7;
+        }
+        .docente-boton-inicio {
+            margin-top: 10px;
+        }
+        #panel-juego { padding: 10px 0; }
+        .game-top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 248, 235, 0.6);
+            padding: 15px 20px;
+            border-radius: 40px;
+            border: 1px solid #c9a96e;
+        }
+        .game-stats { display: flex; gap: 25px; flex-wrap: wrap; font-weight: 700; font-size: 1.1rem; }
+        .game-stats span {
+            background: #3a2c1b;
+            color: #f5f0e8;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+        .game-stats .puntos { background: #b08d4b; color: #1f160e; }
+        .dado-area { display: flex; align-items: center; gap: 15px; }
+        .dado {
+            width: 70px;
+            height: 70px;
+            background: #fefcf7;
+            border-radius: 16px;
+            border: 3px solid #3a2c1b;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 10px;
+            box-shadow: 0 6px 0 #3a2c1b;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+        .dado:active { transform: scale(0.95); }
+        .dado .punto {
+            background: #3a2c1b;
+            border-radius: 50%;
+            width: 70%;
+            height: 70%;
+            place-self: center;
+            display: none;
+        }
+        .dado .punto.show { display: block; }
+        .btn-tirar { font-size: 1.2rem; padding: 10px 24px; }
+        .tablero {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 6px;
+            margin: 20px 0;
+            background: #dacbb4;
+            padding: 12px;
+            border-radius: 30px;
+            border: 4px solid #b08d4b;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+            min-height: 300px;
+        }
+        .casilla {
+            background: #fdfaf3;
+            border-radius: 10px;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: #3a2c1b;
+            border: 2px solid #c9a96e;
+            transition: 0.3s;
+            position: relative;
+            font-family: 'Cinzel', serif;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .casilla.meta { background: #c9a96e; color: #1f160e; border-color: #8f7642; font-size: 0.7rem; }
+        .casilla.trampa { background: #f5c2c2; border-color: #b13e3e; }
+        .casilla.trampa .icono { font-size: 1.2rem; line-height: 1; }
+        .casilla.premio { background: #b8d9f5; border-color: #2d6a9f; }
+        .casilla.premio .icono { font-size: 1.2rem; line-height: 1; }
+        .casilla.actual {
+            background: #3a2c1b;
+            color: #f5f0e8;
+            border-color: #b08d4b;
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px #b08d4b, 0 0 20px rgba(201,169,110,0.5);
+            z-index: 2;
+        }
+        .casilla.actual .icono { color: #f5f0e8; }
+        .casilla.superada { opacity: 0.7; filter: grayscale(0.3); }
+        .casilla .num { position: absolute; top: 2px; left: 4px; font-size: 0.45rem; opacity: 0.6; }
+        .casilla .icono { font-size: 1.1rem; z-index: 1; }
+        .ficha {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            background: radial-gradient(circle at 30% 30%, #f5d742, #b08d4b);
+            border-radius: 50%;
+            border: 3px solid #3a2c1b;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            z-index: 5;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            color: #1f160e;
+            font-weight: 900;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+        }
+        .ficha::after { content: "⚔️"; font-size: 1.2rem; line-height: 1; }
+        .casilla.actual .ficha { display: flex; }
+        .casilla:not(.actual) .ficha { display: none; }
+
+        .pregunta-area {
+            background: #fefcf7;
+            border-radius: 30px;
+            padding: 25px;
+            margin-top: 15px;
+            border: 2px solid #c9a96e;
+            box-shadow: inset 0 0 0 4px #f5f0e8, 0 8px 20px rgba(0,0,0,0.1);
+            min-height: 80px;
+            position: relative;
+        }
+        .pregunta-area .mensaje-espera {
+            color: #5a4a32;
+            font-style: italic;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .popup-overlay.show { display: flex; }
+        .popup-box {
+            background: #fefcf7;
+            border-radius: 40px;
+            padding: 30px 35px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 4px solid #c9a96e;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            position: relative;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .popup-box .timer {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #b13e3e;
+            font-family: 'Cinzel', serif;
+            float: right;
+            margin-left: 15px;
+            background: #fff;
+            padding: 0 12px;
+            border-radius: 12px;
+            border: 2px solid #b13e3e;
+        }
+        .popup-box .pregunta-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            clear: both;
+            color: #1f160e;
+        }
+        .popup-box .opciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .popup-box .opciones button {
+            background: #f5f0e8;
+            border: 2px solid #c9a96e;
+            border-radius: 50px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            font-weight: 500;
+        }
+        .popup-box .opciones button:hover { background: #dacbb4; transform: scale(1.02); }
+        .popup-box .opciones button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .popup-box .feedback {
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 20px;
+            clear: both;
+        }
+        .popup-box .feedback.correcto { background: #b8d9b8; color: #1f4a1f; }
+        .popup-box .feedback.incorrecto { background: #f5c2c2; color: #6f2525; }
+        .popup-box .feedback.trampa { background: #f5c2c2; color: #6f2525; }
+        .popup-box .feedback.premio { background: #b8d9f5; color: #1f4a6f; }
+
+        #panel-resultado { text-align: center; }
+        .result-box {
+            background: #fefcf7;
+            border-radius: 40px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 20px auto;
+            border: 3px solid #c9a96e;
+        }
+        .result-box .nota { font-size: 4rem; font-weight: 900; font-family: 'Cinzel', serif; color: #b08d4b; }
+        .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .result-stats div { background: #f5f0e8; padding: 12px 24px; border-radius: 40px; border: 1px solid #c9a96e; }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .result-actions .btn { min-width: 180px; }
+
+        /* Enlace docente fijo */
+        .docente-link {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            font-size: 0.7rem;
+            color: #8f8a7a;
+            text-decoration: none;
+            background: rgba(255,248,235,0.6);
+            padding: 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #c9a96e;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 50;
+            font-family: 'Roboto', sans-serif;
+        }
+        .docente-link:hover { background: #c9a96e; color: #1f160e; }
+
+        /* Modal docente */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: #f5f0e8;
+            border-radius: 40px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 4px solid #c9a96e;
+        }
+        .close-modal {
+            float: right;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #3a2c1b;
+            line-height: 1;
+        }
+        #panel-docente table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        #panel-docente th, #panel-docente td { border: 1px solid #c9a96e; padding: 8px; text-align: center; font-size: 0.85rem; }
+        #panel-docente th { background: #3a2c1b; color: #f5f0e8; }
+        #panel-docente td .btn-sm { padding: 4px 10px; font-size: 0.7rem; }
+        .docente-controls { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 15px 0; }
+
+        @media (max-width: 800px) {
+            .game-container { padding: 15px; }
+            .tablero { gap: 4px; padding: 8px; }
+            .casilla { font-size: 0.55rem; border-radius: 6px; }
+            .casilla .num { font-size: 0.4rem; }
+            .opciones { grid-template-columns: 1fr; }
+            .game-top { flex-direction: column; align-items: stretch; }
+            .dado-area { justify-content: center; }
+            .inicio-title { font-size: 1.8rem; }
+            .popup-box { padding: 20px; }
+            .result-actions .btn { min-width: 140px; }
+            #panel-docente table th, #panel-docente table td { padding: 4px; font-size: 0.7rem; }
+        }
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .flex-center { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .badge { display: inline-block; background: #3a2c1b; color: #f5f0e8; padding: 4px 14px; border-radius: 40px; font-size: 0.8rem; }
+        .icono-griego { font-size: 2rem; margin: 0 10px; }
+    </style>
+</head>
+<body>
+    <!-- Enlace fijo a panel docente -->
+    <div class="docente-link" id="docente-link">🔑 Docente</div>
+
+    <div class="game-container" id="app">
+        <!-- PANEL INICIO -->
+        <div id="panel-inicio" class="panel active">
+            <div class="inicio-header">
+                <span class="icono-griego">⚔️</span>
+                <h1 class="inicio-title">El Feudalismo como Sistema Económico</h1>
+                <span class="icono-griego">🏰</span>
+            </div>
+            <p class="inicio-sub" style="font-style:italic; color:#5a4a32;">
+                “¿Por qué el feudalismo fue un sistema económico racional para su época y qué lo hizo colapsar?”
+            </p>
+            <div class="reglas-box">
+                <h3>📜 Reglas del juego</h3>
+                <ul>
+                    <li><strong>Objetivo:</strong> Llegar a la casilla <strong>100</strong> respondiendo preguntas sobre el feudalismo como sistema económico.</li>
+                    <li><strong>Dado:</strong> Tira el dado para avanzar. Cada número te mueve esa cantidad de casillas.</li>
+                    <li><strong>Casillas especiales:</strong> <span style="color:#b13e3e;">🔴 Trampa</span> (retrocedes 2 pasos) y <span style="color:#2d6a9f;">🔵 Premio</span> (+10 puntos).</li>
+                    <li><strong>Preguntas:</strong> Al caer en una casilla normal sin superar, debes responder. Si aciertas, <span class="gold-text">la casilla queda superada</span>. Si fallas, <span style="color:#b13e3e;">retrocedes</span> el número del dado.</li>
+                    <li><strong>⏱️ Bonus de tiempo:</strong> Si respondes <strong>en 5 segundos o menos</strong>, ganas +50 puntos extra (además de +50 por acierto). Si fallas, pierdes 50 puntos.</li>
+                    <li><strong>Puntuación:</strong> +50 por acierto, -50 por error, +50 bonus rápido, +10 por premio. Nota final sobre 10.</li>
+                </ul>
+            </div>
+            <div class="registro">
+                <select id="input-curso" class="input-field" style="max-width:200px;">
+                    <option value="1BGU A">1BGU A</option>
+                    <option value="1BGU B">1BGU B</option>
+                    <option value="1BGU C">1BGU C</option>
+                </select>
+                <select id="input-nombre" class="input-field" style="max-width:300px;">
+                    <option value="">-- Selecciona tu nombre --</option>
+                </select>
+                <button class="btn btn-gold" id="btn-comenzar">⚡ Comenzar</button>
+            </div>
+            <div id="mensaje-error" style="color:#b13e3e; font-weight:bold; margin-top:10px;"></div>
+            <!-- Botón panel docente visible -->
+            <div class="docente-boton-inicio">
+                <button class="btn" id="btn-panel-docente-inicio" style="background:#5a4a32; padding:8px 20px; font-size:0.9rem;">👨‍🏫 Panel Docente</button>
+            </div>
+            <div class="copyright">© 2026 · Elaborado por Mr. Alberto Ottati R.</div>
+        </div>
+
+        <!-- PANEL JUEGO -->
+        <div id="panel-juego" class="panel">
+            <div class="game-top">
+                <div class="game-stats">
+                    <span>🎯 Casilla: <strong id="casilla-actual">1</strong></span>
+                    <span class="puntos">🏅 Puntos: <strong id="puntos-actual">0</strong></span>
+                    <span>✅ Aciertos: <span id="aciertos">0</span></span>
+                    <span>❌ Errores: <span id="errores">0</span></span>
+                </div>
+                <div class="dado-area">
+                    <div class="dado" id="dado">
+                        <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+                        <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+                        <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+                    </div>
+                    <button class="btn btn-gold btn-tirar" id="btn-tirar">🎲 Tirar</button>
+                </div>
+            </div>
+            <div class="tablero" id="tablero"></div>
+            <div class="pregunta-area" id="pregunta-area">
+                <div id="pregunta-contenido">
+                    <p class="mensaje-espera">Tira el dado para comenzar tu viaje por el mundo feudal.</p>
+                </div>
+            </div>
+            <div style="margin-top:10px; text-align:right;">
+                <button class="btn" style="background:#5a4a32; padding:6px 16px; font-size:0.8rem;" id="btn-volver-inicio">🏠 Salir</button>
+            </div>
+        </div>
+
+        <!-- PANEL RESULTADO -->
+        <div id="panel-resultado" class="panel">
+            <h2>🏁 ¡Has llegado a la meta!</h2>
+            <div class="result-box">
+                <div>Tu nota final</div>
+                <div class="nota" id="nota-final">0.0</div>
+                <div style="font-size:1.2rem; margin-top:10px;" id="mensaje-final"></div>
+                <div class="result-stats">
+                    <div>✅ Aciertos: <strong id="r-aciertos">0</strong></div>
+                    <div>❌ Errores: <strong id="r-errores">0</strong></div>
+                    <div>⏱️ Bonos: <strong id="r-bonos">0</strong></div>
+                    <div>🏅 Puntos: <strong id="r-puntos">0</strong></div>
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-gold" id="btn-descargar-resultados">📥 Descargar resultados (PDF)</button>
+                    <button class="btn" id="btn-reintentar">🔄 Jugar de nuevo</button>
+                </div>
+            </div>
+            <div class="copyright" style="margin-top:20px;">© 2026 · Elaborado por Mr. Alberto Ottati R.</div>
+        </div>
+
+        <!-- POPUP PREGUNTA -->
+        <div class="popup-overlay" id="popup-pregunta">
+            <div class="popup-box">
+                <div class="timer" id="popup-timer">⏱️ 0s</div>
+                <div id="popup-contenido"></div>
+            </div>
+        </div>
+
+        <!-- MODAL DOCENTE -->
+        <div class="modal-overlay" id="modal-docente">
+            <div class="modal-box">
+                <span class="close-modal" id="cerrar-modal">&times;</span>
+                <h2>👨‍🏫 Panel Docente</h2>
+                <p>Ingresa la clave de acceso:</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <input type="password" id="clave-docente" class="input-field" placeholder="Clave" style="max-width:200px;">
+                    <button class="btn btn-gold" id="btn-validar-clave">🔓 Validar</button>
+                </div>
+                <div id="contenido-docente" style="display:none; margin-top:15px;">
+                    <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
+                        <span><strong>Total registros:</strong> <span id="total-registros">0</span></span>
+                        <button class="btn" style="background:#2d6a2d;" id="btn-exportar-excel">📊 Exportar a Excel</button>
+                        <button class="btn" style="background:#5a4a32;" id="btn-limpiar-reportes">🗑️ Limpiar</button>
+                    </div>
+                    <div style="margin-top:10px; text-align:center;">
+                        <button class="btn btn-test" id="btn-test-docente">🧪 Prueba de envío</button>
+                    </div>
+                    <div style="overflow-x:auto; margin-top:10px;">
+                        <table id="tabla-reportes">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Curso</th>
+                                    <th>Nota</th>
+                                    <th>Aciertos</th>
+                                    <th>Errores</th>
+                                    <th>Puntos</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpo-reportes"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <p id="msg-clave" style="color:#b13e3e; margin-top:10px;"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // LISTAS DE ESTUDIANTES
+        // ============================================================
+        const ESTUDIANTES = {
+            '1BGU A': ['ALBAN ALTAMIRANO, IVANNA','ARTEAGA PLAZA, MARIA EMILIA','BEJAR JIMENEZ, HELENA VICTORIA',
+                'CADENA RUIZ, ABIGAIL','CARDENAS ASTUDILLO, JUAN','CARRILLO PEREZ, MIGUEL',
+                'CASTILLO RAMIREZ, MARCO','CHONG QUI PEÑAFIEL, MARIA EMILIA','DEL SALTO PALACIOS, MARIA DEL MA',
+                'DIAZ VELIZ, EDUARDO','ESTRADA VERA, ARIANA','FARFAN LEON, LUCIANA',
+                'FERNANDEZ GONZABAY, AMANDA','FIALLOS CONSTANTE, BRUNO','GALEFSKI MERINO, ALANIS',
+                'GARATE ANDRADE, MANUEL','LEON HIDALGO, JORGE','MEDINA GOMEZ, NICOLAS',
+                'MEDINA MOREJON, FABIANNA','MOHR MOSCOL, LUCAS','MONCADA TAPIA, PEDRO',
+                'MONTIEL CEDEÑO, RUTH','NAVIA ALCIVAR, MIGUEL','SALAZAR CAMPUZANO, THELMO',
+                'VARGAS CARVAJAL, MATIAS'],
+            '1BGU B': ['CARDENAS VASQUEZ, VALENTINA','DARQUEA GUERRERO, ISABELLA','DVORQUEZ SAMAN, EITAN',
+                'ENCALADA ZAMBRANO, PATRICK','FLORES SANCHEZ, VALENTINA','GARCES CABEZAS, DOMENICA',
+                'GONZALEZ LOPEZ, ISABELLA','GONZALEZ VELASCO, ESTEFANIA','HIDALGO DROUET, SAMANTHA',
+                'HOYOS ESPIN, AMANDA','LABRE GALARZA, RAFAELLA','MOSCOSO MARTINEZ, ALICIA',
+                'MUECKAY SALVATIERRA, LUCAS','NAHT MUÑOZ, DOMENICA','NARANJO OJEDA, MAIHA',
+                'ORTIZ CABRERA , DYLAN','RODRIGUEZ RUIZ, DANNA','SANTA CRUZ CERON, MATTIAS',
+                'SOLORZANO REYES, SEBASTIAN','TAPIA GARZON, ANDRES','VALLEJO HERDOIZA, NICOLAS',
+                'WENDT LANDIVAR, NATHALIE','ZAMBRANO MOREIRA, MARIA VICTORIA','ZAPATIER PEREZ, LEONARDO'],
+            '1BGU C': ['ALAVA PONCE, ISABELLA','ALVARADO CASTRO, RICARDO','BONILLA CHAVARRIA, JUAN DIEGO',
+                'CELLERI RAMIREZ, FELIPE','CHACON REYES, BELEN','CRUZ PINEDA, DOMENICA',
+                'DE LA CUADRA GARCES, EILEEN','ENCALADA ZAMBRANO, SURI','GARCIA VELEZ, GRACE',
+                'GAVILANES MENDEZ, WILSON','GILER CAÑARTE, LUCCIANA','MARTINEZ VELASQUEZ, WLADIMIR',
+                'MORALES FLORES, EMILIO','OLIVEIRA YEPEZ, ELIANE','PALACIOS RECALDE, EDUARDO','QUIMI CEDILLO, KRYSTELL',
+                'REINA SANCHEZ, NISHMA','RIVADENEIRA LUZARDO, AMANDA','RIVERA TINOCO, ALEXA',
+                'TOLEDO CASTILLO, ROBERTO','TRUJILLO HAILLARD, PEPO TIMOTHEE','VELEZ ZAMBRANO, SAMUEL',
+                'VERA GILER, DARMIN','YCAZA MONTJOY, RICARDO']
+        };
+
+        const COMPLETADOS_KEY = 'estudiantesCompletadosFeudalismo';
+        function obtenerCompletados() { return JSON.parse(localStorage.getItem(COMPLETADOS_KEY) || '[]'); }
+        function agregarCompletado(nombre) {
+            const completados = obtenerCompletados();
+            if (!completados.includes(nombre)) {
+                completados.push(nombre);
+                localStorage.setItem(COMPLETADOS_KEY, JSON.stringify(completados));
+            }
+        }
+        function estaCompletado(nombre) { return obtenerCompletados().includes(nombre); }
+
+        // ============================================================
+        // BANCO DE PREGUNTAS (100) - OPCIONES EQUILIBRADAS
+        // ============================================================
+        const PREGUNTAS_BASE = [
+            { texto: "¿Cuál era el problema económico fundamental en la Europa feudal?", opciones: ["Exceso de moneda acuñada circulando por toda Europa", "Inseguridad, ineficiencia agrícola y ausencia de capital", "Sobrepoblación en las ciudades medievales europeas", "Falta de rutas comerciales hacia el continente asiático"], correcta: 1 },
+            { texto: "¿Qué provocaba la inseguridad física en el mundo feudal?", opciones: ["Un Estado central fuerte y bien organizado", "Exceso de ejércitos permanentes en campaña", "Guerras entre ciudades comerciales rivales", "Ausencia de Estado central, invasiones y bandidaje"], correcta: 3 },
+            { texto: "¿Por qué el 80-90% de la población debía cultivar la tierra?", opciones: ["La tecnología estaba estancada y solo así se evitaba la inanición", "El comercio generaba demasiadas ganancias para los nobles", "La moneda acuñada abundaba en los mercados locales", "Los nobles prohibían la artesanía en sus dominios"], correcta: 0 },
+            { texto: "¿Qué consecuencia tuvo el colapso del comercio a larga distancia?", opciones: ["El auge de la banca internacional europea", "El crecimiento de las ciudades portuarias", "La desaparición casi total de la moneda acuñada", "La creación de gremios mercantiles poderosos"], correcta: 2 },
+            { texto: "¿Qué es el Equilibrio Feudal?", opciones: ["Un acuerdo comercial firmado entre reinos vecinos", "Una alianza militar contra los invasores vikingos", "Un sistema para sobrevivir a las tres carencias", "Un impuesto cobrado a los campesinos del reino"], correcta: 2 },
+            { texto: "¿Cuál de estas NO era una carencia del problema económico feudal?", opciones: ["Exceso de excedente acumulado", "Inseguridad física constante", "Ineficiencia agrícola del campo", "Ausencia de capital acumulado"], correcta: 0 },
+            { texto: "¿Qué significaba la ausencia de capital en el feudalismo?", opciones: ["Los nobles acumulaban grandes fortunas en oro", "Los bancos controlaban toda la economía", "Las ciudades dominaban el intercambio", "No había moneda acuñada ni comercio a larga distancia"], correcta: 3 },
+            { texto: "¿Qué amenaza constante sufría la población feudal?", opciones: ["Sequías prolongadas", "Invasiones y bandidaje", "Epidemias de origen urbano", "Impuestos excesivos del comercio"], correcta: 1 },
+            { texto: "¿Qué porcentaje de la población debía cultivar para evitar la inanición?", opciones: ["Entre el 80% y el 90%", "Entre el 30% y el 40%", "Entre el 10% y el 20%", "Menos del 5%"], correcta: 0 },
+            { texto: "¿Qué faltaba para mejorar el rendimiento agrícola en el feudalismo?", opciones: ["Mano de obra disponible en el campo", "Tierras cultivables y fértiles", "Tecnología, pues estaba estancada", "Semillas importadas de otros reinos"], correcta: 2 },
+            { texto: "¿Qué papel jugaba el Estado central en la seguridad feudal?", opciones: ["Era fuerte y protegía a todos", "Era débil o simplemente ausente", "Controlaba un ejército permanente", "Mantenía la paz con leyes escritas"], correcta: 1 },
+            { texto: "¿Para qué fue diseñado el sistema feudal?", opciones: ["Para acumular riqueza mediante el comercio global", "Para industrializar la producción agrícola del reino", "Para centralizar el poder en las ciudades", "Para sobrevivir a las tres carencias económicas"], correcta: 3 },
+            { texto: "¿Qué porcentaje de la economía feudal se dedicaba a la agricultura de subsistencia?", opciones: ["El 50%", "El 30%", "El 10%", "El 90%"], correcta: 3 },
+            { texto: "¿Qué porcentaje de la economía feudal se dedicaba a guerra y seguridad?", opciones: ["El 25%", "El 5%", "El 45%", "El 70%"], correcta: 1 },
+            { texto: "¿Qué porcentaje de la economía feudal se dedicaba a comercio y artesanía?", opciones: ["El 20%", "El 40%", "El 5%", "El 60%"], correcta: 2 },
+            { texto: "¿Por qué la tierra era el recurso más valioso del feudalismo?", opciones: ["Sin tecnología, más tierra era más comida", "Porque contenía yacimientos de oro y plata", "Porque era la única vía de comercio posible", "Porque permitía construir ciudades amuralladas"], correcta: 0 },
+            { texto: "¿Qué significaba que la tierra era un recurso por el que valía la pena matar?", opciones: ["La tierra servía para acuñar moneda de oro y plata", "Más tierra controlada significaba más comida producida", "Los nobles la usaban como adorno de poder y estatus", "La tierra era un símbolo religioso sagrado del reino"], correcta: 1 },
+            { texto: "¿Por qué no se podía mejorar el rendimiento de la tierra?", opciones: ["Por el exceso de fertilizantes", "Por la abundancia de herramientas", "Por el clima demasiado cálido", "Por la falta de tecnología disponible"], correcta: 3 },
+            { texto: "¿Qué actividad ocupaba el 90% de la economía feudal?", opciones: ["La agricultura de subsistencia", "El comercio a larga distancia", "La artesanía especializada", "La guerra de conquista"], correcta: 0 },
+            { texto: "¿Qué actividades ocupaban solo el 5% cada una en la economía feudal?", opciones: ["Agricultura y ganadería de subsistencia", "Minería y pesca en los ríos cercanos", "Guerra y seguridad, y comercio y artesanía", "Educación y religión en los monasterios"], correcta: 2 },
+            { texto: "¿Cuál era la única forma de producir más calorías sin tecnología?", opciones: ["Importar alimentos de otros reinos", "Usar fertilizantes químicos", "Controlar más hectáreas de tierra", "Mejorar las semillas"], correcta: 2 },
+            { texto: "¿Qué recurso funcionaba como moneda en el feudalismo?", opciones: ["La tierra", "El oro", "La sal", "Las especias"], correcta: 0 },
+            { texto: "¿Quién estaba en la cima de la pirámide feudal?", opciones: ["Los Caballeros", "Los Campesinos", "Los Siervos", "El Rey"], correcta: 3 },
+            { texto: "¿Qué orden seguía la pirámide feudal de arriba hacia abajo?", opciones: ["Campesinos, Caballeros, Nobles y el Rey", "Rey, Nobles, Caballeros, Campesinos y Siervos", "Rey, Campesinos, Nobles y los Caballeros", "Nobles, Rey, Siervos y los Caballeros"], correcta: 1 },
+            { texto: "¿Sobre qué trabajo se sostenía toda la pirámide feudal?", opciones: ["El trabajo agrícola de campesinos y siervos", "El comercio de los mercaderes del reino", "La minería de los esclavos de las minas", "La recaudación de los recaudadores reales"], correcta: 0 },
+            { texto: "¿Por qué los monarcas cedían el control de la tierra?", opciones: ["Preferían vivir en el campo con sus vasallos", "Querían eliminar a la nobleza del reino", "No tenían dinero para pagar un ejército permanente", "Buscaban fundar nuevas ciudades comerciales"], correcta: 2 },
+            { texto: "¿Qué compraban los monarcas al ceder el control de la tierra?", opciones: ["Mercancías extranjeras", "Lealtad de los nobles", "Tecnología agrícola", "Apoyo del clero"], correcta: 1 },
+            { texto: "¿Qué recibía un noble a cambio de lealtad y defensa militar?", opciones: ["Un salario del tesoro real", "Títulos comerciales", "Exención de impuestos", "El control de la tierra"], correcta: 3 },
+            { texto: "¿Qué es el goteo de la tierra?", opciones: ["La erosión de los campos de cultivo del feudo", "El reparto de las cosechas entre los siervos", "La venta de las tierras en subasta pública", "La distribución de la tierra desde el Rey hacia abajo"], correcta: 3 },
+            { texto: "¿Qué función cumplían los caballeros en la pirámide feudal?", opciones: ["La recaudación de impuestos", "La defensa militar del feudo", "La administración de justicia", "El comercio con otras regiones"], correcta: 1 },
+            { texto: "¿Qué valor central ascendió en el sistema feudal?", opciones: ["La Libertad", "La Igualdad", "La Obligación", "La Propiedad privada"], correcta: 2 },
+            { texto: "¿Cómo se ejercía la gobernanza en el feudalismo?", opciones: ["De forma local, en cada feudo", "Desde una capital centralizada", "Mediante asambleas democráticas", "A través de gobernadores imperiales"], correcta: 0 },
+            { texto: "¿Qué elementos componían el señorío?", opciones: ["Puerto, mercado, banco y aduana del señorío", "Molino, campos de grano, horno, castillo y chozas", "Universidad, catedral, hospital y biblioteca", "Talleres, fábricas, almacenes y ferias del reino"], correcta: 1 },
+            { texto: "¿Qué es la autarquía del señorío?", opciones: ["Un sistema de comercio con reinos lejanos", "Una alianza militar entre señoríos vecinos", "Un impuesto pagado al rey cada año agrícola", "Una economía cerrada que produce lo que consume"], correcta: 3 },
+            { texto: "¿Qué porcentaje de lo que consumía producía el señorío?", opciones: ["El 100%", "El 50%", "El 25%", "El 10%"], correcta: 0 },
+            { texto: "¿Cómo era el comercio exterior en el feudalismo?", opciones: ["Abundante y seguro", "Regular y organizado", "Escaso y peligroso", "Inexistente por completo"], correcta: 2 },
+            { texto: "¿A qué se parecía el señorío según la presentación?", opciones: ["A un banco central del reino feudal europeo", "A una empresa de comercio global moderno", "A una corporación moderna e ineficiente", "A un gremio artesanal de la ciudad medieval"], correcta: 2 },
+            { texto: "¿Por qué el señorío era ineficiente?", opciones: ["Debía producir todo lo que consumía internamente", "Porque contrataba trabajadores externos del reino", "Porque usaba tecnología avanzada de la época", "Porque dependía del comercio exterior lejano"], correcta: 0 },
+            { texto: "¿Qué infraestructura del señorío molía el grano?", opciones: ["El horno comunal", "El castillo", "Las chozas campesinas", "El molino del Señor"], correcta: 3 },
+            { texto: "¿Qué función tenía el castillo en el señorío?", opciones: ["Almacenamiento de cosechas del feudo", "Protección y control del territorio", "Celebración de ferias comerciales", "Refugio del ganado del señor"], correcta: 1 },
+            { texto: "¿Dónde vivían los campesinos del señorío?", opciones: ["En chozas dentro del señorío", "En ciudades amuralladas", "En los castillos del noble", "En monasterios cercanos"], correcta: 0 },
+            { texto: "¿Qué producían los campos de grano del señorío?", opciones: ["Materia prima para exportar al exterior", "Forraje para el ganado del señor", "El alimento básico de toda la comunidad", "Semillas para vender en el mercado"], correcta: 2 },
+            { texto: "¿Qué porcentaje del tiempo del siervo pertenecía al Señor?", opciones: ["El 50%", "El 80%", "El 30%", "El 10%"], correcta: 1 },
+            { texto: "¿Qué porcentaje del tiempo quedaba para el propio siervo?", opciones: ["El 40%", "El 60%", "El 80%", "El 20%"], correcta: 3 },
+            { texto: "¿En qué trabajaba el siervo durante el Tiempo del Señor?", opciones: ["Su propia parcela de subsistencia familiar", "Talleres artesanales de la aldea feudal", "Rutas comerciales del feudo vecino", "Tierras del noble, caminos y fortificaciones"], correcta: 3 },
+            { texto: "¿Cómo era el trabajo en el Tiempo del Señor?", opciones: ["Voluntario y bien remunerado en moneda", "Obligatorio, supervisado y bajo amenaza", "Libre y sin supervisión del señor", "Opcional según la temporada agrícola"], correcta: 1 },
+            { texto: "¿Cuándo podía el siervo cultivar su propia parcela?", opciones: ["Antes de comenzar el trabajo del señor", "Cuando el señor viajaba a la corte", "Solo después de cumplir sus obligaciones", "Nunca, la parcela no existía para él"], correcta: 2 },
+            { texto: "¿Qué era la verdadera moneda de pago en el feudalismo?", opciones: ["El tiempo y la energía humana", "Las monedas de oro", "Las especias orientales", "Las cabezas de ganado"], correcta: 0 },
+            { texto: "¿Qué cultivaba el siervo en su propio tiempo?", opciones: ["Las tierras exclusivas del noble", "Su parcela de subsistencia", "Los jardines del castillo", "Los campos comunales de caza"], correcta: 1 },
+            { texto: "¿Qué supervisaba el señor durante el trabajo obligatorio?", opciones: ["La educación de los niños del feudo", "Las cosechas de los siervos del señorío", "El comercio de la aldea campesina", "El trabajo en sus tierras exclusivas"], correcta: 3 },
+            { texto: "¿Qué ocurría si el siervo no cumplía sus obligaciones?", opciones: ["Enfrentaba la amenaza física del señor", "Recibía un salario menor en moneda", "Era enviado a la ciudad del reino", "Perdía su parcela por un año entero"], correcta: 0 },
+            { texto: "¿Qué reparaba el siervo durante el Tiempo del Señor?", opciones: ["El molino y el horno", "Las chozas de otros siervos", "Caminos y fortificaciones", "Los puentes del reino"], correcta: 2 },
+            { texto: "¿Cuál era un costo para el siervo en el balance feudal?", opciones: ["Acceso a una parcela agrícola", "Protección armada del castillo", "Trabajo físico gratuito para el Señor", "Resolución legal de disputas"], correcta: 2 },
+            { texto: "¿Qué significaba la pérdida total de movilidad del siervo?", opciones: ["Estaba atado a la tierra por nacimiento", "Podía viajar libremente entre feudos", "Debía pagar peaje para mudarse de feudo", "Solo podía emigrar con permiso real"], correcta: 0 },
+            { texto: "¿Qué eran los peajes forzosos?", opciones: ["Impuestos pagados al rey en moneda de oro", "Multas por abandonar el feudo sin permiso", "Pagos por usar los caminos reales del reino", "Uso obligatorio y tasado del molino y del horno"], correcta: 3 },
+            { texto: "¿Qué beneficio obtenía el siervo en el balance feudal?", opciones: ["Libertad para emigrar a las ciudades", "Acceso a una parcela para evitar el hambre", "Salario en moneda por su trabajo diario", "Propiedad de las tierras del señor feudal"], correcta: 1 },
+            { texto: "¿Qué protección recibía el siervo dentro del señorío?", opciones: ["Protección armada contra bandidos e invasores", "Protección legal de sus derechos civiles", "Protección comercial de sus negocios propios", "Protección religiosa de la iglesia local"], correcta: 0 },
+            { texto: "¿Qué otro beneficio daba el señorío al siervo?", opciones: ["Educación gratuita para sus hijos", "Participación en asambleas políticas", "Resolución legal de disputas y orden social", "Exención de todo trabajo agrícola"], correcta: 2 },
+            { texto: "¿Qué compraba el siervo con su propia vida?", opciones: ["Libertad y riqueza", "Seguridad y comida", "Educación y cultura", "Tierras y ganado"], correcta: 1 },
+            { texto: "¿Qué era un lujo inasequible para el siervo?", opciones: ["La comida", "La seguridad", "La vivienda", "La libertad"], correcta: 3 },
+            { texto: "¿Qué eran las necesidades extremas del siervo?", opciones: ["Libertad y movilidad", "Educación y cultura", "Riqueza y poder", "Seguridad y comida"], correcta: 3 },
+            { texto: "¿Cuál era el costo de oportunidad de la libertad del siervo?", opciones: ["El salario que ganaba en la ciudad", "La seguridad y la comida del señor", "Las tierras que heredaba de su padre", "El prestigio social de su familia campesina"], correcta: 1 },
+            { texto: "¿Qué limitaba las cosechas en el feudalismo?", opciones: ["El exceso de fertilizantes", "La abundancia de herramientas", "La dependencia total del clima", "La falta de campesinos"], correcta: 2 },
+            { texto: "¿Qué fenómeno climático agravó las cosechas feudales?", opciones: ["La Pequeña Edad de Hielo", "El calentamiento global", "Las lluvias torrenciales", "Las sequías del desierto"], correcta: 0 },
+            { texto: "¿Por qué no había innovación tecnológica en el feudalismo?", opciones: ["Porque los campesinos rechazaban el cambio", "Sin capital previo no hay inversión en herramientas", "Porque el rey prohibía los inventos nuevos", "Porque la iglesia censuraba la ciencia nueva"], correcta: 1 },
+            { texto: "¿Qué ocurría con la producción agrícola feudal?", opciones: ["Se acumulaba en graneros reales", "Se exportaba a otros reinos", "Se invertía en nuevas tecnologías", "Se consumía total e inmediatamente"], correcta: 3 },
+            { texto: "¿Qué era el excedente económico en el feudalismo?", opciones: ["Cero, apenas alcanzaba para sobrevivir", "La mitad de la cosecha anual", "Un tercio de la producción", "Todo lo que sobraba del trueque"], correcta: 0 },
+            { texto: "¿Por qué era imposible ahorrar en el feudalismo?", opciones: ["Porque el rey confiscaba los ahorros", "Porque la moneda no tenía valor real", "No había excedente para acumular capital", "Porque los bancos no existían aún"], correcta: 2 },
+            { texto: "¿Qué cerraba el círculo vicioso del estancamiento?", opciones: ["Comercio creciente, moneda abundante y ahorro real", "Tecnología avanzada, excedente y acumulación de capital", "Cosechas limitadas, sin innovación y sin excedente", "Ciudades prósperas, bancos y crédito fácil de obtener"], correcta: 2 },
+            { texto: "¿Qué impedía la inversión en mejores herramientas?", opciones: ["La falta de capital previo", "La abundancia de mano de obra", "El exceso de cosechas", "La competencia de las ciudades"], correcta: 0 },
+            { texto: "¿Cuál era la base de la riqueza en la economía feudal?", opciones: ["El Capital", "Las Ideas", "El Comercio", "La Tierra"], correcta: 3 },
+            { texto: "¿Cuál es la base de la riqueza en la economía de mercado?", opciones: ["La Tierra cultivable", "El Capital y las Ideas", "La Fuerza militar", "El Trueque local"], correcta: 1 },
+            { texto: "¿Cómo era la mano de obra en la economía feudal?", opciones: ["Siervos con obligación forzada y heredada", "Empleados con contrato libre firmado", "Trabajadores con movilidad total garantizada", "Esclavos comprados en mercados abiertos"], correcta: 0 },
+            { texto: "¿Cómo es la mano de obra en la economía de mercado?", opciones: ["Siervos atados a la tierra", "Esclavos sin derechos", "Empleados con contrato libre y movilidad", "Campesinos con obligaciones hereditarias"], correcta: 2 },
+            { texto: "¿Cómo era el intercambio en la economía feudal?", opciones: ["Comercio global y moneda de curso legal", "Autarquía local y trueque forzado", "Mercados financieros internacionales", "Subastas reguladas por el Estado"], correcta: 1 },
+            { texto: "¿Cómo es el intercambio en la economía de mercado?", opciones: ["Trueque forzado entre señoríos", "Autarquía en cada feudo", "Intercambio exclusivamente local", "Comercio global y moneda de curso legal"], correcta: 3 },
+            { texto: "¿Cuál era el objetivo del sistema feudal?", opciones: ["Crecimiento e innovación constante", "Acumulación de ganancias", "Expansión del comercio global", "Subsistencia pura y seguridad física"], correcta: 3 },
+            { texto: "¿Cuál es el objetivo del sistema de mercado?", opciones: ["Subsistencia pura y seguridad física", "Crecimiento, innovación y ganancias", "Autosuficiencia de cada feudo del reino", "Estabilidad sin cambios económicos"], correcta: 1 },
+            { texto: "¿Qué diferencia a los siervos de los empleados?", opciones: ["Trabajo agrícola frente a trabajo urbano", "Salario fijo frente a trueque", "Obligación forzada frente a contrato libre", "Movilidad frente a herencia"], correcta: 2 },
+            { texto: "¿Qué diferencia al trueque forzado de la moneda de curso legal?", opciones: ["Intercambio local frente a comercio global", "Comercio libre frente a control estatal", "Mercados abiertos frente a ferias cerradas", "Precios fijos frente a precios libres"], correcta: 0 },
+            { texto: "¿En qué año llegó la Peste Negra a Europa?", opciones: ["1247", "1347", "1447", "1547"], correcta: 1 },
+            { texto: "¿Hasta qué porcentaje de la fuerza laboral eliminó la Peste Negra?", opciones: ["Una cuarta parte", "Un décimo", "Casi toda", "Hasta la mitad"], correcta: 3 },
+            { texto: "¿En cuántos años eliminó la Peste Negra esa fuerza laboral?", opciones: ["Cinco años, entre 1347 y 1352", "Un año, en 1347", "Diez años, entre 1340 y 1350", "Veinte años, entre 1330 y 1350"], correcta: 0 },
+            { texto: "¿Qué pasó con la oferta de trabajo tras la peste?", opciones: ["Aumentó levemente", "Se mantuvo igual", "Cayó drásticamente", "Se duplicó"], correcta: 2 },
+            { texto: "¿Qué subió tras la caída de la oferta de trabajo?", opciones: ["El valor de la tierra cultivable del feudo", "El precio de los alimentos del mercado", "El valor del trabajo y el poder de negociar", "El poder de los señores feudales locales"], correcta: 2 },
+            { texto: "¿Cómo era la situación económica antes de 1347?", opciones: ["Tierra escasa y valiosa, mano de obra abundante", "Tierra abundante y mano de obra escasa", "Tierra y trabajo igualmente escasos en el reino", "Tierra y trabajo igualmente abundantes en el reino"], correcta: 0 },
+            { texto: "¿Cómo era la situación económica después de 1350?", opciones: ["Tierra escasa y mano de obra abundante", "Ambos recursos abundantes en el reino", "Ambos recursos escasos en el reino", "Mano de obra escasa, tierra abandonada"], correcta: 3 },
+            { texto: "¿Qué recurso se volvió el más escaso tras la peste?", opciones: ["La tierra", "El trabajo", "El oro", "El grano"], correcta: 1 },
+            { texto: "¿Qué tenían los señores feudales tras la peste?", opciones: ["Vastas tierras pero nadie que las trabajara", "Muchos trabajadores pero pocas tierras", "Grandes fortunas en moneda", "Ejércitos de siervos leales"], correcta: 0 },
+            { texto: "¿Qué cambió de repente en la economía feudal?", opciones: ["La cantidad de tierra disponible", "El número de castillos", "El recurso más escaso de la economía", "La tecnología agrícola"], correcta: 2 },
+            { texto: "¿Qué debían ofrecer los señores para competir por trabajadores?", opciones: ["Más tierra para cultivar en el feudo", "Dinero real en lugar de servidumbre", "Protección militar adicional del castillo", "Exención de todo impuesto del reino"], correcta: 1 },
+            { texto: "¿Qué significa la frase el aire de la ciudad te hace libre?", opciones: ["Las ciudades ofrecían mejor clima y aire", "Los nobles vivían en el campo con sus siervos", "El campo era más saludable que la ciudad", "Los siervos escapaban a las ciudades libres"], correcta: 3 },
+            { texto: "¿Qué destruyó el resurgimiento del dinero en efectivo?", opciones: ["El poder de los señores feudales locales", "La agricultura de subsistencia del feudo", "La construcción de castillos defensivos", "La necesidad del trueque de tierras"], correcta: 3 },
+            { texto: "¿Cuáles fueron las tres fuerzas del colapso feudal?", opciones: ["Guerra, peste y hambruna", "Salarios, migración y moneda", "Iglesia, nobleza y campesinos", "Tierra, agua y clima"], correcta: 1 },
+            { texto: "¿A dónde escapaban los siervos para vender su trabajo?", opciones: ["A los monasterios", "A los feudos vecinos", "A las ciudades crecientes", "A las tierras del rey"], correcta: 2 },
+            { texto: "¿Qué vendían los siervos en las ciudades?", opciones: ["Su trabajo al mejor postor", "Sus tierras heredadas", "Su ganado y cosechas", "Sus herramientas agrícolas"], correcta: 0 },
+            { texto: "¿Qué creó la escasez de seguridad en la Edad Media?", opciones: ["El comercio global de la época", "La descentralización feudal", "La moneda acuñada del reino", "Las ciudades libres del reino"], correcta: 1 },
+            { texto: "¿Qué creó la escasez de tierra y tecnología?", opciones: ["El mercado de trabajo libre", "La migración a las ciudades libres", "El resurgimiento del dinero en efectivo", "El trabajo forzado de los siervos"], correcta: 3 },
+            { texto: "¿Qué destruyó el sistema feudal según la síntesis?", opciones: ["La escasez repentina de trabajo", "La abundancia de tierra", "El exceso de tecnología", "La falta de moneda"], correcta: 0 },
+            { texto: "¿Qué fue el feudalismo según la síntesis final?", opciones: ["Un error histórico sin explicación económica clara", "Una etapa de ignorancia y caos económico absoluto", "Un equilibrio racional que colapsó con la nueva escasez", "Un sistema impuesto por los vikingos invasores del norte"], correcta: 2 },
+        ]
+
+        // Confirmación en dos pasos sin window.confirm (bloqueado en iframes de Moodle/Hyperclass).
+        // Devuelve true solo en el segundo click dentro de la ventana de 6 segundos.
+        function armButton(btn, textoConfirmar) {
+            if (!btn) return true; // sin botón de referencia, no bloquear
+            if (btn.dataset.armed === "1") { btn.dataset.armed = ""; return true; }
+            btn.dataset.armed = "1";
+            btn.dataset.origText = btn.textContent;
+            btn.textContent = textoConfirmar;
+            btn.classList.add("ring-2", "ring-red-300");
+            setTimeout(() => {
+                if (btn.isConnected && btn.dataset.armed === "1") {
+                    btn.dataset.armed = "";
+                    btn.textContent = btn.dataset.origText;
+                    btn.classList.remove("ring-2", "ring-red-300");
+                }
+            }, 6000);
+            return false;
+        }
+
+        function shuffleArray(array) {
+            const arr = array.slice();
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        const FORMSPREE_URL = 'https://formspree.io/f/xkodvbyn';
+
+        const TOTAL_CASILLAS = 100;
+        const CASILLAS_TRAMPA = [4,14,24,34,44,54,64,74,84,94];
+        const CASILLAS_PREMIO = [7,17,27,37,47,57,67,77,87,97];
+
+        let estado = {
+            nombre: '', curso: '', posicion: 1,
+            casillasSuperadas: new Array(TOTAL_CASILLAS+1).fill(false),
+            puntos: 0, aciertos: 0, errores: 0, bonosTiempo: 0,
+            partidaTerminada: false, dadoActual: 0, enPregunta: false,
+            cronometro: null, tiempoPregunta: 0, preguntaActualIndex: -1,
+            respuestaBloqueada: false, historial: [], preguntasPartida: [],
+            erroresTransformados: [] // <-- NUEVO: guarda los errores transformados al finalizar
+        };
+
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const $ = id => document.getElementById(id);
+        const panelInicio = $('panel-inicio'), panelJuego = $('panel-juego'), panelResultado = $('panel-resultado'), modalDocente = $('modal-docente');
+        const inputCurso = $('input-curso'), inputNombre = $('input-nombre'), btnComenzar = $('btn-comenzar'), mensajeError = $('mensaje-error');
+        const tablero = $('tablero'), casillaActual = $('casilla-actual'), puntosActual = $('puntos-actual'), aciertosSpan = $('aciertos'), erroresSpan = $('errores');
+        const btnTirar = $('btn-tirar'), dadoDiv = $('dado'), preguntaContenido = $('pregunta-contenido'), btnVolverInicio = $('btn-volver-inicio');
+        const popupOverlay = $('popup-pregunta'), popupContenido = $('popup-contenido'), popupTimer = $('popup-timer');
+        const notaFinal = $('nota-final'), mensajeFinal = $('mensaje-final'), rAciertos = $('r-aciertos'), rErrores = $('r-errores'), rBonos = $('r-bonos'), rPuntos = $('r-puntos');
+        const btnReintentar = $('btn-reintentar'), btnDescargar = $('btn-descargar-resultados');
+        const docenteLink = $('docente-link'), btnCerrarModal = $('cerrar-modal'), claveDocente = $('clave-docente'), btnValidarClave = $('btn-validar-clave');
+        const contenidoDocente = $('contenido-docente'), cuerpoReportes = $('cuerpo-reportes'), totalRegistros = $('total-registros');
+        const btnExportarExcel = $('btn-exportar-excel'), btnLimpiarReportes = $('btn-limpiar-reportes'), msgClave = $('msg-clave');
+
+        // ============================================================
+        // FUNCIONES DE NOMBRES
+        // ============================================================
+        function actualizarNombres() {
+            const curso = inputCurso.value;
+            const lista = ESTUDIANTES[curso] || [];
+            const completados = obtenerCompletados();
+            inputNombre.innerHTML = '<option value="">-- Selecciona --</option>';
+            lista.forEach(nombre => {
+                const opt = document.createElement('option');
+                opt.value = nombre;
+                opt.textContent = nombre;
+                if (completados.includes(nombre)) {
+                    opt.style.color = '#999';
+                    opt.style.fontStyle = 'italic';
+                    opt.textContent += ' (✅ completado)';
+                }
+                inputNombre.appendChild(opt);
+            });
+            mensajeError.textContent = '';
+        }
+        actualizarNombres();
+        inputCurso.addEventListener('change', actualizarNombres);
+
+        // ============================================================
+        // FUNCIONES DEL JUEGO
+        // ============================================================
+        function mostrarPanel(panel) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            panel.classList.add('active');
+        }
+
+        function tirarDado() { return Math.floor(Math.random() * 6) + 1; }
+
+        function renderDado(valor) {
+            const puntos = dadoDiv.querySelectorAll('.punto');
+            puntos.forEach(p => p.classList.remove('show'));
+            const patrones = {1:[4],2:[2,6],3:[2,4,6],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+            if (patrones[valor]) patrones[valor].forEach(idx => puntos[idx].classList.add('show'));
+        }
+
+        function actualizarStats() {
+            casillaActual.textContent = estado.posicion;
+            puntosActual.textContent = estado.puntos;
+            aciertosSpan.textContent = estado.aciertos;
+            erroresSpan.textContent = estado.errores;
+        }
+
+        function construirTablero() {
+            tablero.innerHTML = '';
+            for (let i=1; i<=TOTAL_CASILLAS; i++) {
+                const div = document.createElement('div');
+                div.className = 'casilla';
+                div.dataset.idx = i;
+                if (i===TOTAL_CASILLAS) div.classList.add('meta');
+                if (CASILLAS_TRAMPA.includes(i)) div.classList.add('trampa');
+                if (CASILLAS_PREMIO.includes(i)) div.classList.add('premio');
+                const num = document.createElement('span');
+                num.className = 'num';
+                num.textContent = i;
+                div.appendChild(num);
+                const icon = document.createElement('span');
+                icon.className = 'icono';
+                if (CASILLAS_TRAMPA.includes(i)) icon.textContent = '⚠️';
+                else if (CASILLAS_PREMIO.includes(i)) icon.textContent = '⭐';
+                else if (i===TOTAL_CASILLAS) icon.textContent = '🏁';
+                else icon.textContent = '•';
+                div.appendChild(icon);
+                const ficha = document.createElement('div');
+                ficha.className = 'ficha';
+                div.appendChild(ficha);
+                tablero.appendChild(div);
+            }
+            actualizarTablero();
+        }
+
+        function actualizarTablero() {
+            const casillas = tablero.querySelectorAll('.casilla');
+            casillas.forEach((div, idx) => {
+                const num = idx+1;
+                div.classList.remove('actual', 'superada');
+                if (estado.casillasSuperadas[num]) div.classList.add('superada');
+                if (estado.posicion === num) div.classList.add('actual');
+            });
+        }
+
+        function iniciarCronometroPopup() {
+            estado.tiempoPregunta = 0;
+            popupTimer.textContent = '⏱️ 0s';
+            if (estado.cronometro) clearInterval(estado.cronometro);
+            estado.cronometro = setInterval(() => {
+                estado.tiempoPregunta++;
+                popupTimer.textContent = `⏱️ ${estado.tiempoPregunta}s`;
+            }, 1000);
+        }
+
+        function detenerCronometro() {
+            if (estado.cronometro) { clearInterval(estado.cronometro); estado.cronometro = null; }
+        }
+
+        function bloquearRespuesta(bloq) {
+            estado.respuestaBloqueada = bloq;
+            const botones = popupContenido.querySelectorAll('.opciones button');
+            botones.forEach(b => b.disabled = bloq);
+            btnTirar.disabled = bloq ? false : true;
+        }
+
+        function mostrarPopupPregunta(index) {
+            estado.enPregunta = true;
+            estado.preguntaActualIndex = index;
+            const p = estado.preguntasPartida[index % estado.preguntasPartida.length];
+            if (!p) {
+                popupContenido.innerHTML = `<div class="feedback incorrecto">Error: pregunta no encontrada.</div>`;
+                popupOverlay.classList.add('show');
+                return;
+            }
+            let html = `<div class="pregunta-text">${p.texto}</div><div class="opciones">`;
+            p.opciones.forEach((opc, i) => {
+                html += `<button data-idx="${i}" class="opcion-btn">${String.fromCharCode(65+i)}) ${opc}</button>`;
+            });
+            html += `</div><div class="feedback" id="popup-feedback"></div>`;
+            popupContenido.innerHTML = html;
+
+            const btns = popupContenido.querySelectorAll('.opcion-btn');
+            btns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (estado.respuestaBloqueada || !estado.enPregunta) return;
+                    const idx = parseInt(this.dataset.idx);
+                    responderPreguntaPopup(idx);
+                });
+            });
+
+            popupOverlay.classList.add('show');
+            iniciarCronometroPopup();
+            bloquearRespuesta(false);
+            const fb = document.getElementById('popup-feedback');
+            if (fb) fb.className = 'feedback';
+            popupTimer.style.display = 'inline-block';
+        }
+
+        function responderPreguntaPopup(idxElegida) {
+            if (!estado.enPregunta || estado.respuestaBloqueada) return;
+            estado.enPregunta = false;
+            detenerCronometro();
+            bloquearRespuesta(true);
+            const p = estado.preguntasPartida[estado.preguntaActualIndex % estado.preguntasPartida.length];
+            const correcta = p.correcta;
+            const esCorrecto = (idxElegida === correcta);
+            const tiempo = estado.tiempoPregunta;
+            const bonusTiempo = (tiempo <= 5);
+            let puntosGanados = 0;
+            let fbMsg = '';
+
+            const historialItem = {
+                textoPregunta: p.texto,
+                opciones: p.opciones,
+                opcionElegida: idxElegida,
+                correcta: esCorrecto,
+                respuestaCorrecta: correcta
+            };
+
+            if (esCorrecto) {
+                estado.aciertos++;
+                puntosGanados = 50;
+                if (bonusTiempo) { puntosGanados += 50; estado.bonosTiempo++; fbMsg = '✅ ¡Correcto! +50 pts. ¡Bonus tiempo! +50 extra.'; }
+                else { fbMsg = '✅ ¡Correcto! +50 pts.'; }
+                estado.puntos += puntosGanados;
+                estado.casillasSuperadas[estado.posicion] = true;
+                if (estado.posicion === TOTAL_CASILLAS) {
+                    popupOverlay.classList.remove('show');
+                    terminarPartida();
+                    return;
+                }
+            } else {
+                estado.errores++;
+                puntosGanados = -50;
+                estado.puntos += puntosGanados;
+                const retroceso = estado.dadoActual;
+                fbMsg = `❌ Incorrecto. -50 pts. Retrocedes ${retroceso} casillas.`;
+                let nuevaPos = Math.max(estado.posicion - retroceso, 1);
+                estado.posicion = nuevaPos;
+            }
+            estado.historial.push(historialItem);
+
+            const fb = document.getElementById('popup-feedback');
+            if (fb) { fb.textContent = fbMsg; fb.className = 'feedback ' + (esCorrecto ? 'correcto' : 'incorrecto'); }
+            actualizarStats();
+            actualizarTablero();
+
+            setTimeout(() => {
+                popupOverlay.classList.remove('show');
+                estado.enPregunta = false;
+                bloquearRespuesta(false);
+                btnTirar.disabled = false;
+                if (!estado.partidaTerminada) {
+                    preguntaContenido.innerHTML = `<p class="mensaje-espera">Tira el dado para continuar.</p>`;
+                }
+                actualizarStats();
+                actualizarTablero();
+            }, 1200);
+        }
+
+        function procesarCasillaEspecial() {
+            const pos = estado.posicion;
+            if (pos===0 || pos>TOTAL_CASILLAS) return false;
+            if (estado.casillasSuperadas[pos]) return false;
+
+            if (CASILLAS_TRAMPA.includes(pos)) {
+                estado.casillasSuperadas[pos] = true;
+                let nuevaPos = Math.max(pos-2, 1);
+                estado.posicion = nuevaPos;
+                preguntaContenido.innerHTML = `<div class="feedback trampa">⚠️ ¡Trampa! Retrocedes 2 casillas.</div>`;
+                actualizarStats();
+                actualizarTablero();
+                btnTirar.disabled = true;
+                setTimeout(() => {
+                    if (!estado.partidaTerminada) {
+                        preguntaContenido.innerHTML = `<p class="mensaje-espera">Tira el dado para continuar.</p>`;
+                        btnTirar.disabled = false;
+                    }
+                }, 1500);
+                return true;
+            } else if (CASILLAS_PREMIO.includes(pos)) {
+                estado.casillasSuperadas[pos] = true;
+                estado.puntos += 10;
+                preguntaContenido.innerHTML = `<div class="feedback premio">⭐ ¡Premio! +10 puntos.</div>`;
+                actualizarStats();
+                actualizarTablero();
+                btnTirar.disabled = true;
+                setTimeout(() => {
+                    if (!estado.partidaTerminada) {
+                        preguntaContenido.innerHTML = `<p class="mensaje-espera">Tira el dado para continuar.</p>`;
+                        btnTirar.disabled = false;
+                    }
+                }, 1500);
+                return true;
+            }
+            return false;
+        }
+
+        function enviarResultadosAFormspree() {
+            const datos = {
+                quiz: 'Feudalismo como Sistema Económico',
+                nombre: estado.nombre,
+                curso: estado.curso,
+                nota: parseFloat(notaFinal.textContent),
+                aciertos: estado.aciertos,
+                errores: estado.errores,
+                bonos: estado.bonosTiempo,
+                puntos: estado.puntos,
+                historial_errores: estado.historial.filter(h=>!h.correcta).map(h=>({
+                    pregunta: h.textoPregunta,
+                    tu_respuesta: h.opciones[h.opcionElegida],
+                    respuesta_correcta: h.opciones[h.respuestaCorrecta]
+                }))
+            };
+            fetch(FORMSPREE_URL, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify(datos) })
+            .then(r=>r.ok?console.log('✅ Enviado a Formspree'):console.warn('⚠️ Formspree:', r.status))
+            .catch(e=>console.error('❌ Error al enviar:', e));
+        }
+
+        function ejecutarPrueba() {
+            estado.nombre='TESTER'; estado.curso='1BGU A'; estado.aciertos=12; estado.errores=3; estado.bonosTiempo=2; estado.puntos=1050;
+            estado.historial = [
+                {textoPregunta:'¿Qué porcentaje de la economía feudal se dedicaba a la agricultura de subsistencia?', opciones:['El 90%','El 50%','El 30%','El 10%'], opcionElegida:1, correcta:false, respuestaCorrecta:0},
+                {textoPregunta:'¿Qué orden seguía la pirámide feudal de arriba hacia abajo?', opciones:['Rey, Nobles, Caballeros, Campesinos y Siervos','Campesinos, Caballeros, Nobles y el Rey','Rey, Campesinos, Nobles y los Caballeros','Nobles, Rey, Siervos y los Caballeros'], opcionElegida:2, correcta:false, respuestaCorrecta:0},
+                {textoPregunta:'¿Qué evento eliminó hasta la mitad de la fuerza laboral de Europa?', opciones:['La Peste Negra','La Guerra de los Cien Años','La Pequeña Edad de Hielo','Las Cruzadas'], opcionElegida:3, correcta:false, respuestaCorrecta:0}
+            ];
+            // Transformar errores para guardar
+            const erroresTransformados = estado.historial.filter(h=>!h.correcta).map(h=>({
+                pregunta: h.textoPregunta,
+                tu_respuesta: h.opciones[h.opcionElegida],
+                respuesta_correcta: h.opciones[h.respuestaCorrecta]
+            }));
+            // Guardar también en estado.erroresTransformados
+            estado.erroresTransformados = erroresTransformados;
+            const total = estado.aciertos+estado.errores;
+            const nota = (estado.aciertos/total)*10;
+            notaFinal.textContent = nota.toFixed(1);
+            guardarReporte(estado.nombre, estado.curso, nota, estado.aciertos, estado.errores, estado.puntos, erroresTransformados);
+            mostrarPanel(panelResultado);
+            rAciertos.textContent=estado.aciertos; rErrores.textContent=estado.errores; rBonos.textContent=estado.bonosTiempo; rPuntos.textContent=estado.puntos;
+            mensajeFinal.textContent = '🧪 Prueba de envío. Resultados simulados.';
+            enviarResultadosAFormspree();
+        }
+
+        function terminarPartida() {
+            estado.partidaTerminada = true;
+            detenerCronometro();
+            bloquearRespuesta(true);
+            btnTirar.disabled = true;
+            const totalRespuestas = estado.aciertos + estado.errores;
+            let nota = 0;
+            if (totalRespuestas > 0) nota = (estado.aciertos / totalRespuestas) * 10;
+            nota = Math.round(nota * 10) / 10;
+            
+            // Transformar errores al formato esperado y guardarlos en el estado
+            const erroresTransformados = estado.historial.filter(h=>!h.correcta).map(h=>({
+                pregunta: h.textoPregunta,
+                tu_respuesta: h.opciones[h.opcionElegida],
+                respuesta_correcta: h.opciones[h.respuestaCorrecta]
+            }));
+            estado.erroresTransformados = erroresTransformados;
+            
+            guardarReporte(estado.nombre, estado.curso, nota, estado.aciertos, estado.errores, estado.puntos, erroresTransformados);
+            agregarCompletado(estado.nombre);
+            
+            mostrarPanel(panelResultado);
+            notaFinal.textContent = nota.toFixed(1);
+            rAciertos.textContent = estado.aciertos;
+            rErrores.textContent = estado.errores;
+            rBonos.textContent = estado.bonosTiempo;
+            rPuntos.textContent = estado.puntos;
+            if (nota >= 7) mensajeFinal.textContent = '🎉 ¡Excelente! Has comprendido el equilibrio económico feudal.';
+            else if (nota >= 5) mensajeFinal.textContent = '📖 Buen trabajo, pero puedes profundizar más. Revisa la matriz comparativa.';
+            else mensajeFinal.textContent = '📚 Vuelve a estudiar el contenido y prueba de nuevo. ¡Ánimo!';
+            setTimeout(() => enviarResultadosAFormspree(), 500);
+        }
+
+        // ============================================================
+        // GUARDADO DE REPORTE (con historial de errores transformado)
+        // ============================================================
+        function guardarReporte(nombre, curso, nota, aciertos, errores, puntos, historialErrores) {
+            let reportes = JSON.parse(localStorage.getItem('reportesFeudalismo') || '[]');
+            reportes.push({
+                nombre, curso, nota, aciertos, errores, puntos,
+                fecha: new Date().toLocaleString(),
+                historialErrores: historialErrores || []  // array de {pregunta, tu_respuesta, respuesta_correcta}
+            });
+            localStorage.setItem('reportesFeudalismo', JSON.stringify(reportes));
+        }
+
+        function cargarReportes() { return JSON.parse(localStorage.getItem('reportesFeudalismo') || '[]'); }
+
+        // ============================================================
+        // GENERAR PDF DESDE DATOS (para el panel docente y para el juego)
+        // ============================================================
+        function generarPDFDesdeDatos(nombre, curso, nota, aciertos, errores, puntos, historialErrores) {
+            const total = aciertos + errores;
+            const porcentaje = total > 0 ? Math.round((aciertos / total) * 100) : 0;
+
+            let erroresHTML = '';
+            if (!historialErrores || historialErrores.length === 0) {
+                erroresHTML = '<div style="background:#b8d9b8; padding:15px; border-radius:12px; text-align:center; font-weight:700; color:#1f4a1f;">✅ ¡Felicitaciones! No cometiste ningún error.</div>';
+            } else {
+                let tabla = '<table style="width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9rem;">';
+                tabla += '<thead><tr style="background:#3a2c1b; color:#f5f0e8;">';
+                tabla += '<th style="padding:10px 8px; text-align:left;">#</th>';
+                tabla += '<th style="padding:10px 8px; text-align:left;">Pregunta</th>';
+                tabla += '<th style="padding:10px 8px; text-align:left;">Tu respuesta</th>';
+                tabla += '<th style="padding:10px 8px; text-align:left;">Correcta</th>';
+                tabla += '</tr></thead><tbody>';
+                historialErrores.forEach((item, idx) => {
+                    const bg = idx % 2 === 0 ? '#f5f0e8' : 'transparent';
+                    tabla += `<tr style="background:${bg};">`;
+                    tabla += `<td style="padding:10px 8px; border-bottom:1px solid #dacbb4;">${idx+1}</td>`;
+                    tabla += `<td style="padding:10px 8px; border-bottom:1px solid #dacbb4;">${item.pregunta || 'Pregunta no disponible'}</td>`;
+                    tabla += `<td style="padding:10px 8px; border-bottom:1px solid #dacbb4;">${item.tu_respuesta || 'No disponible'}</td>`;
+                    tabla += `<td style="padding:10px 8px; border-bottom:1px solid #dacbb4;">${item.respuesta_correcta || 'No disponible'}</td>`;
+                    tabla += '</tr>';
+                });
+                tabla += '</tbody></table>';
+                erroresHTML = tabla;
+            }
+
+            const contenidoPDF = `
+            <div style="font-family: 'Roboto', sans-serif; background: #fdfaf3; padding: 30px; color: #3a2c1b; max-width: 800px; margin: 0 auto;">
+                <h1 style="font-family: 'Cinzel', serif; font-size: 1.8rem; color: #3a2c1b; text-align: center; border-bottom: 3px solid #b08d4b; padding-bottom: 15px; margin-bottom: 25px;">
+                    INFORME DE RETROALIMENTACIÓN<br>DESAFÍO "EL FEUDALISMO COMO SISTEMA ECONÓMICO"
+                </h1>
+                <div style="text-align: center; font-size: 1.2rem; color: #5a4a32; margin-bottom: 25px; font-style: italic;">
+                    HISTORIA Y CIUDADANÍA · 1BGU · UNIDAD 3 - EDAD MEDIA
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; background: #f5f0e8; padding: 20px; border-radius: 12px; border: 1px solid #c9a96e; margin-bottom: 25px;">
+                    <span style="font-weight: 700; color: #3a2c1b;">Estudiante:</span>
+                    <span style="font-weight: 400; color: #1f160e;">${nombre}</span>
+                    <span style="font-weight: 700; color: #3a2c1b;">Curso:</span>
+                    <span style="font-weight: 400; color: #1f160e;">${curso}</span>
+                    <span style="font-weight: 700; color: #3a2c1b;">% Aciertos:</span>
+                    <span style="font-weight: 400; color: #1f160e;">${porcentaje}%</span>
+                    <span style="font-weight: 700; color: #3a2c1b;">Puntos obtenidos:</span>
+                    <span style="font-weight: 400; color: #1f160e;">${puntos}</span>
+                    <span style="font-weight: 700; color: #3a2c1b;">Nota (sobre 10):</span>
+                    <span style="font-weight: 400; color: #1f160e;">${nota}</span>
+                </div>
+                <div style="font-family: 'Cinzel', serif; font-size: 1.3rem; color: #3a2c1b; margin: 25px 0 15px 0; border-bottom: 2px solid #c9a96e; padding-bottom: 8px;">
+                    📋 Retroalimentación de errores
+                </div>
+                ${erroresHTML}
+                <div style="margin-top: 30px; text-align: center; font-size: 0.8rem; color: #5a4a32; border-top: 1px solid #c9a96e; padding-top: 15px; font-style: italic;">
+                    Documento generado automáticamente · © 2026 Mr. Alberto Ottati R.
+                </div>
+            </div>
+            `;
+
+            // Mostrar modal con el informe
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.background = 'rgba(0,0,0,0.7)';
+            overlay.style.zIndex = '99999';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.backdropFilter = 'blur(5px)';
+
+            const reportDiv = document.createElement('div');
+            reportDiv.style.background = '#fdfaf3';
+            reportDiv.style.padding = '30px';
+            reportDiv.style.borderRadius = '20px';
+            reportDiv.style.maxWidth = '800px';
+            reportDiv.style.width = '95%';
+            reportDiv.style.maxHeight = '90vh';
+            reportDiv.style.overflowY = 'auto';
+            reportDiv.style.boxShadow = '0 20px 60px rgba(0,0,0,0.5)';
+            reportDiv.style.position = 'relative';
+            reportDiv.style.border = '4px solid #c9a96e';
+            reportDiv.innerHTML = contenidoPDF;
+
+            overlay.appendChild(reportDiv);
+            document.body.appendChild(overlay);
+
+            // Deshabilitar todos los botones de informe (para evitar múltiples clics)
+            const botonesInforme = document.querySelectorAll('.btn-ver-informe');
+            botonesInforme.forEach(b => b.disabled = true);
+
+            html2pdf().from(reportDiv).set({
+                margin: [15, 15],
+                filename: `Informe_Retroalimentacion_Feudalismo_${nombre}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).save().then(() => {
+                document.body.removeChild(overlay);
+                botonesInforme.forEach(b => b.disabled = false);
+            }).catch((err) => {
+                console.error('Error al generar PDF:', err);
+                document.body.removeChild(overlay);
+                botonesInforme.forEach(b => b.disabled = false);
+                alert('Error al generar el PDF. Intenta nuevamente.');
+            });
+        }
+
+        // ============================================================
+        // RENDERIZAR REPORTES (con botón "Ver informe")
+        // ============================================================
+        function renderizarReportes() {
+            const reportes = cargarReportes();
+            const tbody = cuerpoReportes;
+            tbody.innerHTML = '';
+            if (reportes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8">No hay reportes.</td></tr>';
+                totalRegistros.textContent = '0';
+                return;
+            }
+            reportes.forEach((r, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${i+1}</td>
+                    <td>${r.nombre || 'Anónimo'}</td>
+                    <td>${r.curso || '-'}</td>
+                    <td>${r.nota.toFixed(1)}</td>
+                    <td>${r.aciertos || 0}</td>
+                    <td>${r.errores || 0}</td>
+                    <td>${r.puntos || 0}</td>
+                    <td>
+                        <button class="btn btn-sm btn-gold btn-ver-informe" data-index="${i}">📄 Ver informe</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            totalRegistros.textContent = reportes.length;
+
+            // Asignar eventos a los botones "Ver informe"
+            document.querySelectorAll('.btn-ver-informe').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.index);
+                    const reportes = cargarReportes();
+                    const r = reportes[idx];
+                    if (r) {
+                        generarPDFDesdeDatos(r.nombre, r.curso, r.nota, r.aciertos, r.errores, r.puntos, r.historialErrores || []);
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        // GENERACIÓN DE PDF DESDE EL JUEGO (al finalizar)
+        // ============================================================
+        function generarPDF() {
+            if (!estado.nombre || estado.partidaTerminada === false) {
+                alert('No hay datos completos. Debes terminar la partida primero.');
+                return;
+            }
+            // Usar los errores transformados guardados, o fallback al historial
+            let erroresTransformados = estado.erroresTransformados;
+            if (!erroresTransformados || erroresTransformados.length === 0) {
+                erroresTransformados = estado.historial.filter(h=>!h.correcta).map(h=>({
+                    pregunta: h.textoPregunta,
+                    tu_respuesta: h.opciones[h.opcionElegida],
+                    respuesta_correcta: h.opciones[h.respuestaCorrecta]
+                }));
+            }
+            generarPDFDesdeDatos(
+                estado.nombre,
+                estado.curso,
+                parseFloat(notaFinal.textContent),
+                estado.aciertos,
+                estado.errores,
+                estado.puntos,
+                erroresTransformados
+            );
+        }
+
+        // ============================================================
+        // EXPORTAR EXCEL
+        // ============================================================
+        function exportarExcel() {
+            const reportes = cargarReportes();
+            if (reportes.length===0) { alert('No hay datos.'); return; }
+            let csv = 'Nº,Nombre,Curso,Nota (sobre 10),Aciertos,Errores,Puntos,Fecha\n';
+            reportes.forEach((r,i) => {
+                csv += `${i+1},"${r.nombre||''}","${r.curso||''}",${r.nota.toFixed(1)},${r.aciertos||0},${r.errores||0},${r.puntos||0},"${r.fecha||''}"\n`;
+            });
+            const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'reportes_feudalismo.csv';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function reiniciarJuego() {
+            estado.preguntasPartida = shuffleArray([...PREGUNTAS_BASE]);
+            estado.posicion = 1;
+            estado.casillasSuperadas = new Array(TOTAL_CASILLAS+1).fill(false);
+            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0;
+            estado.partidaTerminada = false; estado.enPregunta = false; estado.dadoActual = 0;
+            estado.respuestaBloqueada = false; estado.historial = [];
+            estado.erroresTransformados = []; // limpiar también
+            detenerCronometro();
+            popupTimer.textContent = '⏱️ 0s';
+            popupOverlay.classList.remove('show');
+            preguntaContenido.innerHTML = `<p class="mensaje-espera">Tira el dado para comenzar.</p>`;
+            btnTirar.disabled = false;
+            construirTablero();
+            actualizarStats();
+            actualizarTablero();
+            mostrarPanel(panelJuego);
+            renderDado(1);
+        }
+
+        // ============================================================
+        // EVENTOS
+        // ============================================================
+        btnComenzar.addEventListener('click', function() {
+            const nombre = inputNombre.value;
+            const curso = inputCurso.value;
+            if (!nombre) { mensajeError.textContent = '⚠️ Selecciona tu nombre.'; return; }
+            if (estaCompletado(nombre)) { mensajeError.textContent = '⛔ Ya completaste el desafío.'; return; }
+            mensajeError.textContent = '';
+            estado.nombre = nombre; estado.curso = curso;
+            reiniciarJuego();
+        });
+
+        btnTirar.addEventListener('click', function() {
+            if (estado.enPregunta || estado.partidaTerminada) return;
+            const dado = tirarDado();
+            estado.dadoActual = dado;
+            renderDado(dado);
+            let nuevaPos = Math.min(estado.posicion + dado, TOTAL_CASILLAS);
+            estado.posicion = nuevaPos;
+            actualizarTablero(); actualizarStats();
+
+            if (estado.posicion === TOTAL_CASILLAS) {
+                if (!estado.casillasSuperadas[TOTAL_CASILLAS]) {
+                    const idx = (estado.posicion - 1) % estado.preguntasPartida.length;
+                    mostrarPopupPregunta(idx);
+                    btnTirar.disabled = true;
+                    return;
+                } else { terminarPartida(); return; }
+            }
+
+            const esEspecial = procesarCasillaEspecial();
+            if (esEspecial) return;
+
+            if (!estado.casillasSuperadas[estado.posicion] && estado.posicion > 0) {
+                const idx = (estado.posicion - 1) % estado.preguntasPartida.length;
+                mostrarPopupPregunta(idx);
+                btnTirar.disabled = true;
+            } else {
+                preguntaContenido.innerHTML = `<p class="mensaje-espera">Casilla ${estado.posicion} superada. Tira de nuevo.</p>`;
+                btnTirar.disabled = false;
+            }
+        });
+
+        btnVolverInicio.addEventListener('click', function() {
+            // Sin window.confirm (se bloquea en iframes de Moodle/Hyperclass): doble clic = confirmar.
+            if (!armButton(this, '¿Confirmar salir?')) return;
+            this.textContent = this.dataset.origText;
+            this.classList.remove('ring-2', 'ring-red-300');
+            detenerCronometro(); popupOverlay.classList.remove('show');
+            estado.posicion = 1; estado.casillasSuperadas = new Array(TOTAL_CASILLAS+1).fill(false);
+            estado.puntos = 0; estado.aciertos = 0; estado.errores = 0; estado.bonosTiempo = 0;
+            estado.partidaTerminada = false; estado.enPregunta = false; estado.historial = [];
+            estado.erroresTransformados = [];
+            actualizarStats(); actualizarTablero();
+            mostrarPanel(panelInicio);
+            actualizarNombres();
+        });
+
+        btnReintentar.addEventListener('click', function() {
+            mostrarPanel(panelInicio);
+            actualizarNombres();
+            inputNombre.value = '';
+        });
+
+        btnDescargar.addEventListener('click', generarPDF);
+
+        // ============================================================
+        // PANEL DOCENTE - ABRIR MODAL
+        // ============================================================
+        function abrirPanelDocente() {
+            modalDocente.classList.add('show');
+            contenidoDocente.style.display = 'none';
+            msgClave.textContent = '';
+            claveDocente.value = '';
+        }
+
+        docenteLink.addEventListener('click', abrirPanelDocente);
+        const btnPanelInicio = document.getElementById('btn-panel-docente-inicio');
+        if (btnPanelInicio) {
+            btnPanelInicio.addEventListener('click', abrirPanelDocente);
+        }
+
+        btnCerrarModal.addEventListener('click', function() { modalDocente.classList.remove('show'); });
+        modalDocente.addEventListener('click', function(e) { if (e.target === modalDocente) modalDocente.classList.remove('show'); });
+
+        btnValidarClave.addEventListener('click', function() {
+            const clave = claveDocente.value.trim();
+            if (clave === 'docente2026') {
+                contenidoDocente.style.display = 'block';
+                msgClave.textContent = '';
+                renderizarReportes();
+                const btnTest = document.getElementById('btn-test-docente');
+                if (btnTest) {
+                    btnTest.addEventListener('click', function() {
+                        // Sin window.confirm (se bloquea en iframes de Moodle/Hyperclass): doble clic = confirmar.
+                        if (!armButton(this, '¿Confirmar prueba?')) return;
+                        this.textContent = this.dataset.origText;
+                        this.classList.remove('ring-2', 'ring-red-300');
+                        ejecutarPrueba();
+                    });
+                }
+            } else {
+                msgClave.textContent = '❌ Clave incorrecta.';
+                contenidoDocente.style.display = 'none';
+            }
+        });
+
+        btnExportarExcel.addEventListener('click', exportarExcel);
+        btnLimpiarReportes.addEventListener('click', function() {
+            // Confirmación en dos pasos (sin window.confirm: se bloquea en iframes de Moodle/Hyperclass).
+            if (!armButton(this, '¿Confirmar limpieza TOTAL?')) return;
+            this.textContent = this.dataset.origText;
+            this.classList.remove('ring-2', 'ring-red-300');
+            // Borra TAMBIÉN el candado de "ya completaste" para que el alumno pueda rejugar.
+            localStorage.removeItem('reportesFeudalismo');
+            localStorage.removeItem('estudiantesCompletadosFeudalismo');
+            renderizarReportes();
+            actualizarNombres(); // refresca el selector del panel alumno (quita el "(✅ completado)")
+            showToast('Reportes y registros de completado borrados.');
+        });
+        claveDocente.addEventListener('keydown', e => { if (e.key === 'Enter') btnValidarClave.click(); });
+        inputNombre.addEventListener('change', () => { mensajeError.textContent = ''; });
+
+        // ============================================================
+        // INICIO
+        // ============================================================
+        construirTablero();
+        renderDado(1);
+        estado.posicion = 1;
+        actualizarStats();
+        actualizarTablero();
+        mostrarPanel(panelInicio);
+    </script>
+</body>
+</html>
