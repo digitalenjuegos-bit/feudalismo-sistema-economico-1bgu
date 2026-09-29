@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feudal Quest · Historia 1BGU</title>
+<style>
+  :root{
+    --forest:#1F4A3D;
+    --forest-deep:#14332A;
+    --parchment:#F5F0E8;
+    --parchment-dark:#EAE0CE;
+    --gold:#C9A96E;
+    --gold-dark:#A8864A;
+    --ink:#2B2B2B;
+    --muted:#6B6B6B;
+    --red:#8B1E3F;
+    --green:#1E7B4F;
+    --border:#C9BFA9;
+    --radius:14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size:17px;
+    line-height:1.55;
+    color:var(--ink);
+    background:
+      radial-gradient(ellipse at top, #2E5A4A 0%, var(--forest) 45%, var(--forest-deep) 100%);
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:Georgia, "Times New Roman", serif; color:var(--forest-deep); }
+  .screen{ display:none; max-width:860px; margin:0 auto; padding:20px 16px 48px; }
+  .screen.active{ display:block; }
+
+  /* ── Encabezado ── */
+  .banner{
+    text-align:center;
+    background:linear-gradient(180deg, #2A2118 0%, #3A2C1B 100%);
+    border:2px solid var(--gold);
+    border-radius:var(--radius);
+    padding:22px 16px 18px;
+    margin-bottom:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
+  }
+  .banner h1{
+    color:var(--gold);
+    font-size:2.1rem;
+    letter-spacing:.04em;
+    text-shadow:0 2px 4px rgba(0,0,0,.5);
+  }
+  .banner .crest{ font-size:2.4rem; line-height:1; }
+  .banner .subtitle{ color:#E8DCC4; font-size:.95rem; margin-top:6px; }
+  .banner .unit{
+    color:#B9A87E; font-size:.82rem; margin-top:4px;
+    background:rgba(0,0,0,.25); display:inline-block; padding:3px 12px; border-radius:20px;
+  }
+
+  /* ── Tarjetas ── */
+  .card{
+    background:var(--parchment);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:16px;
+    box-shadow:0 3px 10px rgba(0,0,0,.18);
+  }
+  .card h2{ font-size:1.25rem; margin-bottom:10px; color:var(--forest-deep); }
+  .card ol{ padding-left:22px; }
+  .card li{ margin-bottom:6px; }
+  .note{
+    margin-top:10px; padding:10px 12px; background:#F0E6D2; border-left:4px solid var(--gold-dark);
+    border-radius:6px; font-size:.92rem; color:#5A4A2A;
+  }
+  label{ display:block; font-weight:600; margin-bottom:6px; color:var(--forest-deep); }
+  select{
+    width:100%; padding:12px 14px; font-size:1rem; border:2px solid var(--border);
+    border-radius:8px; background:#fff; color:var(--ink);
+  }
+  select:focus{ outline:3px solid rgba(201,169,110,.5); border-color:var(--gold-dark); }
+  .error{
+    display:none; margin-top:10px; padding:10px 12px; background:#F6E3E8;
+    border-left:4px solid var(--red); border-radius:6px; color:#6E1A33; font-size:.95rem;
+  }
+  .error.show{ display:block; }
+  .error.success{ background:#E3F2E9; border-left-color:var(--green); color:#14532D; }
+
+  /* ── Criaturas ── */
+  .creature-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .creature-card{
+    background:#fff; border:2px solid var(--border); border-radius:12px; padding:14px 10px;
+    text-align:center; cursor:pointer; transition:border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .creature-card:hover{ transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+  .creature-card.selected{ border-color:var(--gold-dark); box-shadow:0 0 0 3px rgba(201,169,110,.45); background:#FDF9F0; }
+  .creature-card .emoji{ font-size:2.6rem; line-height:1.2; }
+  .creature-card .cname{ font-weight:700; color:var(--forest-deep); margin-top:6px; font-size:1rem; }
+  .creature-card .cdesc{ font-size:.82rem; color:var(--muted); margin-top:4px; }
+  .creature-card .chp{ font-size:.8rem; color:var(--green); font-weight:600; margin-top:4px; }
+
+  /* ── Botones ── */
+  .btn{
+    display:inline-block; border:none; cursor:pointer; font-size:1.05rem; font-weight:600;
+    padding:14px 26px; border-radius:10px; background:var(--forest); color:#F5F0E8;
+    transition:background .15s, transform .1s; font-family:inherit;
+  }
+  .btn:hover{ background:var(--forest-deep); }
+  .btn:active{ transform:scale(.98); }
+  .btn:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+  .btn-gold{ background:var(--gold-dark); }
+  .btn-gold:hover{ background:#8F6F3A; }
+  .btn-block{ display:block; width:100%; margin-top:6px; }
+  .btn-sm{ padding:8px 14px; font-size:.9rem; }
+  .btn-danger{ background:var(--red); }
+  .btn-danger:hover{ background:#6E1A33; }
+  .btn-ghost{ background:transparent; color:var(--forest-deep); border:2px solid var(--forest); }
+  .btn-ghost:hover{ background:rgba(31,74,61,.08); }
+  .btn:disabled{ opacity:.55; cursor:not-allowed; }
+
+  /* ── Arena de batalla ── */
+  .battle-header{
+    text-align:center; background:var(--parchment); border:1px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px; margin-bottom:14px;
+  }
+  .gym-badge{
+    display:inline-block; background:var(--forest); color:var(--gold); font-size:.8rem;
+    padding:3px 14px; border-radius:20px; letter-spacing:.05em; font-weight:600;
+  }
+  .battle-header h2{ font-size:1.35rem; margin-top:6px; }
+  .battle-header .leader{ color:var(--muted); font-size:.95rem; }
+  .arena{
+    display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center;
+    background:var(--parchment); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; margin-bottom:14px;
+  }
+  .fighter{ text-align:center; position:relative; }
+  .fighter .creature-emoji{ font-size:3.2rem; line-height:1.1; }
+  .fighter .fighter-name{ font-weight:700; color:var(--forest-deep); margin-top:4px; font-size:.98rem; }
+  .fighter .fighter-role{ font-size:.78rem; color:var(--muted); }
+  .vs{ font-family:Georgia, serif; font-style:italic; color:var(--gold-dark); font-size:1.1rem; }
+  .hp-wrap{ margin-top:8px; }
+  .hp-bar{
+    height:16px; background:#D8CFC0; border-radius:10px; overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .hp-fill{
+    height:100%; width:100%; background:var(--green); border-radius:10px;
+    transition:width .5s ease, background .5s ease;
+  }
+  .hp-fill.low{ background:var(--red); }
+  .hp-text{ font-size:.8rem; color:var(--muted); margin-top:3px; font-weight:600; }
+  .damage-float{
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    font-weight:800; font-size:1.15rem; color:var(--red); pointer-events:none;
+    animation:floatUp 1s ease-out forwards; text-shadow:0 1px 2px rgba(0,0,0,.2);
+  }
+  .damage-float.heal{ color:var(--green); }
+  @keyframes floatUp{
+    0%{ opacity:1; transform:translate(-50%,0); }
+    100%{ opacity:0; transform:translate(-50%,-46px); }
+  }
+  .shake{ animation:shake .4s ease; }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  /* ── Pregunta ── */
+  .question-card{
+    background:var(--parchment); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .q-progress{
+    font-size:.82rem; color:var(--muted); font-weight:600; letter-spacing:.03em;
+    margin-bottom:8px;
+  }
+  .q-text{ font-size:1.12rem; font-weight:600; color:var(--forest-deep); margin-bottom:14px; }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option{
+    text-align:left; width:100%; padding:13px 16px; font-size:1rem; font-family:inherit;
+    background:#fff; border:2px solid var(--border); border-radius:10px; color:var(--ink);
+    cursor:pointer; transition:border-color .12s, background .12s;
+  }
+  .option:hover:not(:disabled){ border-color:var(--gold-dark); background:#FDF9F0; }
+  .option:focus-visible{ outline:3px solid rgba(201,169,110,.5); }
+  .option:disabled{ cursor:default; }
+  .option.correct{ background:#E3F2E9; border-color:var(--green); font-weight:600; }
+  .option.wrong{ background:#F6E3E8; border-color:var(--red); }
+  .option .letter{ display:inline-block; font-weight:800; color:var(--gold-dark); margin-right:8px; }
+  .feedback{
+    margin-top:14px; padding:12px 14px; border-radius:8px; font-size:.98rem; font-weight:600;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.ok{ background:#E3F2E9; color:#14532D; border-left:4px solid var(--green); }
+  .feedback.bad{ background:#F6E3E8; color:#6E1A33; border-left:4px solid var(--red); }
+
+  /* ── Pantallas de resultado ── */
+  .result-box{ text-align:center; padding:26px 18px; }
+  .result-box .big-emoji{ font-size:3.6rem; line-height:1.2; }
+  .result-box h2{ font-size:1.7rem; margin:10px 0 6px; }
+  .result-box .sub{ color:var(--muted); margin-bottom:16px; }
+  .grade-big{
+    font-family:Georgia, serif; font-size:3rem; font-weight:700; color:var(--forest-deep);
+    line-height:1.1;
+  }
+  .grade-label{ color:var(--muted); font-size:.9rem; }
+  .stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:18px 0; }
+  .stat{
+    background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px 8px;
+  }
+  .stat .num{ font-size:1.5rem; font-weight:800; color:var(--forest-deep); }
+  .stat .lbl{ font-size:.78rem; color:var(--muted); }
+  .save-status{ margin-top:12px; font-size:.95rem; font-weight:600; min-height:1.4em; }
+  .save-status.ok{ color:var(--green); }
+  .save-status.warn{ color:#8A6D1A; }
+
+  /* ── Revisión ── */
+  .review-box{ margin-top:16px; text-align:left; }
+  .review-item{
+    background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px;
+  }
+  .review-item .rq{ font-weight:600; color:var(--forest-deep); margin-bottom:6px; }
+  .review-item .ra{ font-size:.92rem; }
+  .review-item .ra .tag{ font-weight:700; }
+  .review-item .ra .tag.yours{ color:var(--red); }
+  .review-item .ra .tag.right{ color:var(--green); }
+
+  /* ── Modal docente ── */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(20,25,20,.72); z-index:60;
+    align-items:flex-start; justify-content:center; padding:30px 14px; overflow-y:auto;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background:var(--parchment); border:2px solid var(--gold); border-radius:var(--radius);
+    max-width:920px; width:100%; padding:22px;
+  }
+  .modal h2{ margin-bottom:12px; }
+  .modal-close{
+    float:right; background:none; border:none; font-size:1.4rem; cursor:pointer; color:var(--muted);
+    padding:2px 8px; border-radius:6px;
+  }
+  .modal-close:hover{ background:rgba(0,0,0,.08); }
+  .teacher-login{ text-align:center; padding:20px; }
+  .teacher-login input{
+    padding:12px 14px; font-size:1rem; border:2px solid var(--border); border-radius:8px; width:240px;
+  }
+  .teacher-panel table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem; }
+  .teacher-panel th, .teacher-panel td{ border:1px solid var(--border); padding:7px 9px; text-align:left; }
+  .teacher-panel th{ background:var(--forest); color:var(--gold); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+  .teacher-panel tr:nth-child(even) td{ background:rgba(0,0,0,.03); }
+  .teacher-controls{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; }
+  .teacher-trigger{
+    position:fixed; top:10px; right:10px; width:18px; height:18px; border-radius:50%;
+    background:rgba(245,240,232,.18); border:1px solid rgba(245,240,232,.35); cursor:pointer;
+    z-index:50; opacity:.55;
+  }
+  .teacher-trigger:hover{ opacity:1; background:rgba(245,240,232,.4); }
+  .table-wrap{ overflow-x:auto; }
+
+  /* ── Toast penalidad ── */
+  #toast-penalidad{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:80;
+    background:#3A2C1B; color:#F5E8C8; padding:12px 20px; border-radius:10px;
+    border:1px solid var(--gold); font-weight:600; font-size:.95rem;
+    box-shadow:0 6px 18px rgba(0,0,0,.4); display:none; pointer-events:none;
+    max-width:92vw; text-align:center;
+  }
+  #toast-penalidad.show{ display:block; }
+
+  /* ── Responsive ── */
+  @media (max-width:640px){
+    body{ font-size:16px; }
+    .banner h1{ font-size:1.7rem; }
+    .creature-grid{ grid-template-columns:1fr; }
+    .arena{ grid-template-columns:1fr; gap:14px; }
+    .vs{ display:none; }
+    .stats-grid{ grid-template-columns:repeat(3,1fr); gap:6px; }
+    .fighter .creature-emoji{ font-size:2.6rem; }
+    .btn{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ PANTALLA DE INICIO ══════════ -->
+<section id="screen-intro" class="screen active">
+  <div class="banner">
+    <div class="crest">🏰</div>
+    <h1>Feudal Quest</h1>
+    <div class="subtitle">Historia y Educación para la Ciudadanía · 1BGU</div>
+    <div class="unit">Unidad 3 · Edad Media: Sistemas, Poder y Organización Económica · Concepto clave: SISTEMAS</div>
+  </div>
+
+  <div class="card">
+    <h2>Cómo jugar</h2>
+    <ol>
+      <li>Elige tu nombre de la lista.</li>
+      <li>Elige tu criatura inicial.</li>
+      <li>Enfrenta a los líderes de los cinco gimnasios respondiendo preguntas sobre el feudalismo.</li>
+      <li>Cada gimnasio tiene cinco preguntas. Si aciertas, tu criatura ataca al rival. Si fallas, el rival te ataca a ti.</li>
+      <li>El daño depende de la dificultad de la pregunta: las preguntas más difíciles causan más daño.</li>
+      <li>Si tu criatura cae, puedes reintentar el gimnasio con preguntas nuevas.</li>
+      <li>Cuando venzas a los cinco líderes, serás campeón y tu nota quedará guardada.</li>
+    </ol>
+    <div class="note">
+      Solo se permite un intento por estudiante. Cada vez que salgas de la pantalla o cambies de ventana se te restan 0.5 puntos.
+    </div>
+  </div>
+
+  <div class="card">
+    <label for="studentSelect">Tu nombre</label>
+    <select id="studentSelect">
+      <option value="">Elige tu nombre</option>
+    </select>
+    <div id="nameError" class="error"></div>
+  </div>
+
+  <div class="card">
+    <h2>Elige tu criatura</h2>
+    <div class="creature-grid" id="creatureGrid"></div>
+  </div>
+
+  <button class="btn btn-gold btn-block" id="btnStart">Comenzar aventura</button>
+</section>
+
+<!-- ══════════ PANTALLA DE BATALLA ══════════ -->
+<section id="screen-battle" class="screen">
+  <div class="battle-header">
+    <span class="gym-badge" id="gymBadge">Gimnasio 1 de 5</span>
+    <h2 id="gymName"></h2>
+    <div class="leader" id="gymLeader"></div>
+  </div>
+
+  <div class="arena">
+    <div class="fighter" id="playerFighter">
+      <div class="creature-emoji" id="playerEmoji"></div>
+      <div class="fighter-name" id="playerName"></div>
+      <div class="fighter-role">Tu criatura</div>
+      <div class="hp-wrap">
+        <div class="hp-bar"><div class="hp-fill" id="playerHp"></div></div>
+        <div class="hp-text" id="playerHpText"></div>
+      </div>
+    </div>
+    <div class="vs">contra</div>
+    <div class="fighter" id="rivalFighter">
+      <div class="creature-emoji" id="rivalEmoji"></div>
+      <div class="fighter-name" id="rivalName"></div>
+      <div class="fighter-role" id="rivalRole"></div>
+      <div class="hp-wrap">
+        <div class="hp-bar"><div class="hp-fill" id="rivalHp"></div></div>
+        <div class="hp-text" id="rivalHpText"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-progress" id="qProgress">Pregunta 1 de 5</div>
+    <p class="q-text" id="qText"></p>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="battleFeedback"></div>
+  </div>
+</section>
+
+<!-- ══════════ GIMNASIO VENCIDO ══════════ -->
+<section id="screen-gym-victory" class="screen">
+  <div class="card result-box">
+    <div class="big-emoji">🏆</div>
+    <h2 id="gymVictoryTitle">¡Gimnasio vencido!</h2>
+    <p class="sub" id="gymVictorySub"></p>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="gvCorrect">0</div><div class="lbl">Aciertos</div></div>
+      <div class="stat"><div class="num" id="gvTotal">5</div><div class="lbl">Preguntas</div></div>
+      <div class="stat"><div class="num" id="gvGyms">1</div><div class="lbl">Gimnasios vencidos</div></div>
+    </div>
+    <button class="btn btn-gold" id="btnNextGym">Siguiente gimnasio</button>
+  </div>
+</section>
+
+<!-- ══════════ DERROTA ══════════ -->
+<section id="screen-defeat" class="screen">
+  <div class="card result-box">
+    <div class="big-emoji">💀</div>
+    <h2>Tu criatura ha caído</h2>
+    <p class="sub" id="defeatSub"></p>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="dfCorrect">0</div><div class="lbl">Aciertos</div></div>
+      <div class="stat"><div class="num" id="dfTotal">5</div><div class="lbl">Preguntas</div></div>
+      <div class="stat"><div class="num" id="dfGyms">1</div><div class="lbl">Gimnasios vencidos</div></div>
+    </div>
+    <p class="sub" id="defeatRetries">Puedes reintentar este gimnasio. Las preguntas cambiarán.</p>
+    <button class="btn btn-gold" id="btnRetryGym">Reintentar gimnasio</button>
+  </div>
+</section>
+
+<!-- ══════════ VICTORIA FINAL ══════════ -->
+<section id="screen-victory" class="screen">
+  <div class="card result-box">
+    <div class="big-emoji" id="finalEmoji">👑</div>
+    <h2 id="finalTitle">¡Eres campeón de Feudal Quest!</h2>
+    <p class="sub" id="finalSub">Venciste a los cinco líderes de los gimnasios del feudo.</p>
+    <div class="grade-label">Tu nota</div>
+    <div class="grade-big" id="finalGrade">0.0</div>
+    <div class="stats-grid">
+      <div class="stat"><div class="num" id="finCorrect">0</div><div class="lbl">Aciertos de 25</div></div>
+      <div class="stat"><div class="num" id="finGyms">5</div><div class="lbl">Gimnasios</div></div>
+      <div class="stat"><div class="num" id="finPenal">0</div><div class="lbl">Penalidades</div></div>
+    </div>
+    <div class="save-status" id="saveStatus"></div>
+    <button class="btn btn-ghost" id="btnToggleReview">Ver revisión de respuestas</button>
+    <div class="review-box" id="reviewBox" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- ══════════ MODAL DOCENTE ══════════ -->
+<div class="modal-overlay" id="modal-teacher" hidden>
+  <div class="modal">
+    <button class="modal-close" id="btnCloseTeacher" aria-label="Cerrar">×</button>
+    <h2>Panel docente</h2>
+    <div id="teacherLogin" class="teacher-login">
+      <label for="teacherKeyInput">Clave del docente</label>
+      <input type="password" id="teacherKeyInput" placeholder="Clave">
+      <div style="margin-top:12px;">
+        <button class="btn btn-sm" id="btnValidateKey">Ingresar</button>
+      </div>
+      <div id="teacherKeyError" class="error"></div>
+    </div>
+    <div id="teacherPanel" class="teacher-panel" style="display:none;">
+      <div class="teacher-controls">
+        <button class="btn btn-sm btn-gold" id="btnExport">Exportar a Excel</button>
+        <button class="btn btn-sm btn-danger" id="btnClearAll">Borrar todas las notas</button>
+        <span id="teacherCount" style="align-self:center;color:var(--muted);font-size:.9rem;"></span>
+      </div>
+      <div class="table-wrap" id="teacherTableWrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de penalidad -->
+<div id="toast-penalidad"></div>
+
+<!-- Punto de acceso docente (discreto) -->
+<button class="teacher-trigger" id="teacherTrigger" title=""></button>
+
+<script>
+/* ═══════════ BANCO DE PREGUNTAS (FUENTE DE VERDAD) ═══════════ */
+const QUESTION_BANK = {
+  "game": "Feudal Quest",
+  "subject": "Historia y Educación para la Ciudadanía 1BGU",
+  "unit": "U3 Edad Media: Sistemas, Poder y Organización Económica",
+  "gyms": [
+    {
+      "id": 1,
+      "name": "Estructura social feudal",
+      "description": "Empecemos por conocer quién era quién en el mundo feudal. Aquí reconocerás los estamentos y las obligaciones que mantenían en pie a la sociedad medieval.",
+      "questions": [
+        {
+          "q": "¿Quién ocupaba la cima de la pirámide social feudal?",
+          "options": [
+            "El rey supremo",
+            "El papa",
+            "Los caballeros del reino",
+            "Los siervos"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué obligación tenía un señor hacia sus vasallos?",
+          "options": [
+            "Entregarles parte de sus cosechas cada año",
+            "Protegerlos y administrar justicia",
+            "Pagarles un salario mensual",
+            "Enseñarles un oficio"
+          ],
+          "correct": 1,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué diferencia al siervo del esclavo?",
+          "options": [
+            "El siervo no puede ser vendido como propiedad",
+            "El siervo puede abandonar la tierra cuando quiera",
+            "El esclavo trabaja solo en las minas",
+            "El siervo pertenece al señor como si fuera un objeto"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué recibía un vasallo a cambio de su lealtad y servicio militar?",
+          "options": [
+            "Un feudo, es decir, tierras",
+            "Un cargo en la iglesia",
+            "Una parte de los impuestos reales",
+            "Un título de rey"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué grupo formaba el estamento más numeroso de la sociedad feudal?",
+          "options": [
+            "Los campesinos y siervos",
+            "Los nobles guerreros",
+            "Los clérigos y monjes",
+            "Los comerciantes y artesanos"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Por qué el poder del rey era limitado en la práctica?",
+          "options": [
+            "Porque dependía de la lealtad de los señores de las tierras",
+            "Porque no tenía un ejército propio",
+            "Porque el papa gobernaba directamente",
+            "Porque los siervos elegían a sus gobernantes cada año en asamblea"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué función cumplía el clero dentro de la sociedad feudal?",
+          "options": [
+            "Orar y administrar los sacramentos",
+            "Recaudar los impuestos para el rey",
+            "Comandar los ejércitos del feudo en la guerra",
+            "Cultivar las tierras del manso"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Cómo se llamaba la relación por la cual un noble entregaba tierras a otro a cambio de servicio?",
+          "options": [
+            "Vasallaje",
+            "Homenaje",
+            "Servidumbre",
+            "Trueque"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué grupo social trabajaba directamente las tierras del señor y entregaba parte de la cosecha?",
+          "options": [
+            "Los siervos de la tierra",
+            "Los caballeros del señor feudal",
+            "Los obispos del reino",
+            "Los mercaderes viajeros"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Economía del feudo",
+      "description": "Ahora entremos al corazón productivo del feudo. Descubre cómo se organizaban la tierra, el trabajo y las herramientas para que todo funcionara sin depender del comercio.",
+      "questions": [
+        {
+          "q": "¿Qué significa que el feudo fuera autosuficiente?",
+          "options": [
+            "Que producía casi todo lo que necesitaba",
+            "Que compraba alimentos en otras regiones lejanas",
+            "Que dependía del comercio marítimo",
+            "Que solo producía para el rey"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Para qué servían las tierras del manso?",
+          "options": [
+            "Para el sustento del siervo",
+            "Para la caza del señor",
+            "Para las cosechas de la iglesia",
+            "Para el pastoreo comunal"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué era la reserva señorial?",
+          "options": [
+            "Las tierras del señor trabajadas por siervos",
+            "El granero donde se guardaba la cosecha",
+            "El bosque comunal del feudo",
+            "Las tierras que el señor vendía a los mercaderes"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Por qué se practicaba el trueque en el feudo?",
+          "options": [
+            "Porque había escasez de moneda",
+            "Porque el rey lo había prohibido",
+            "Porque los mercaderes no aceptaban monedas",
+            "Porque la iglesia lo exigía"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué representaba el molino dentro de la economía del feudo?",
+          "options": [
+            "Capital, es decir, infraestructura productiva",
+            "Un impuesto que pagaban los siervos al señor",
+            "Un lugar de reunión para la comunidad",
+            "Una tierra comunal destinada al pastoreo de animales"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Cuál de los siguientes es uno de los cuatro factores de producción?",
+          "options": [
+            "La tierra",
+            "El rey",
+            "La iglesia",
+            "El impuesto"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Quién cumplía en el feudo la función empresarial de organizar la producción?",
+          "options": [
+            "El señor feudal, dueño de las tierras",
+            "El párroco, guía espiritual de la comunidad",
+            "El mercader, encargado del comercio",
+            "El herrero, fabricante de herramientas"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué eran las tierras comunales del feudo?",
+          "options": [
+            "Bosques y pastos de uso compartido",
+            "Las tierras del señor cultivadas por siervos",
+            "Los campos de batalla del señor",
+            "Las tierras que se vendían en el mercado"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué ocurría con los excedentes de producción del feudo?",
+          "options": [
+            "Se trocaban o se guardaban para el invierno",
+            "Se enviaban al rey como tributo obligatorio cada año",
+            "Se destruían para mantener los precios",
+            "Se vendían en ferias de larga distancia"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Relaciones de dependencia",
+      "description": "El feudalismo se sostenía sobre promesas y lealtades. Aquí explorarás los pactos entre señores y vasallos que mantenían unido al sistema.",
+      "questions": [
+        {
+          "q": "¿Qué era el homenaje?",
+          "options": [
+            "La ceremonia donde el vasallo juraba lealtad",
+            "El pago anual de impuestos al rey",
+            "La entrega de parte de la cosecha al señor del feudo",
+            "La bendición que la iglesia daba al feudo"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué recibía el vasallo a cambio de su servicio militar?",
+          "options": [
+            "Un feudo, tierras para su sustento",
+            "Un puesto en el clero",
+            "Una parte de los impuestos de la iglesia",
+            "El derecho a comerciar libremente"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Qué implicaba el contrato feudal?",
+          "options": [
+            "Obligaciones mutuas entre señor y vasallo",
+            "La compra de tierras por parte del siervo libre",
+            "Un acuerdo comercial entre feudos",
+            "La elección del rey por los nobles"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué significaba la frase 'el vasallo de mi vasallo no es mi vasallo'?",
+          "options": [
+            "Que la lealtad no subía automáticamente en la cadena",
+            "Que los vasallos no podían tener siervos ni tierras a su cargo",
+            "Que el rey no podía exigir servicio a los nobles",
+            "Que cada señor solo podía tener un único vasallo"
+          ],
+          "correct": 0,
+          "difficulty": 3
+        },
+        {
+          "q": "¿Qué debía el vasallo a su señor según el contrato feudal?",
+          "options": [
+            "Aconsejarlo y ayudarlo en guerra",
+            "La mitad de sus cosechas del año",
+            "El diezmo para la iglesia local",
+            "El cuidado de los hijos del señor"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué era la investidura?",
+          "options": [
+            "El acto simbólico de entregar el feudo",
+            "El juramento de fidelidad de los siervos al rey",
+            "La ceremonia de coronación del rey",
+            "El pago del señor a la iglesia"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Podía un vasallo ser a su vez señor de otros nobles?",
+          "options": [
+            "Sí, formando cadenas de vasallaje",
+            "No, el vasallaje era exclusivo del rey",
+            "Solo si el papa lo autorizaba",
+            "Solo después de la muerte del rey"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Sobre qué base se sostenía la relación de vasallaje?",
+          "options": [
+            "Lealtad personal y obligaciones recíprocas",
+            "Un contrato escrito y firmado ante un notario",
+            "El pago de un salario mensual",
+            "La pertenencia a la misma familia real"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué ocurría si un vasallo traicionaba a su señor?",
+          "options": [
+            "Perdía el feudo y la protección",
+            "Era excomulgado por la iglesia del feudo",
+            "Debía pagar una multa al rey",
+            "Era enviado a las cruzadas"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Racionalidad económica",
+      "description": "El feudalismo no fue una época oscura: fue una respuesta lógica a un mundo sin Estado central. Aquí pensarás como economista medieval y entenderás por qué el sistema tenía sentido.",
+      "questions": [
+        {
+          "q": "¿Por qué era racional que un campesino cediera su tierra al señor a cambio de seguridad?",
+          "options": [
+            "Porque la protección valía más que la tierra insegura",
+            "Porque el señor pagaba un salario justo por su trabajo",
+            "Porque la tierra ya no servía para cultivar nada",
+            "Porque el rey lo ordenaba por ley"
+          ],
+          "correct": 0,
+          "difficulty": 3
+        },
+        {
+          "q": "¿Qué problema concreto resolvía el feudalismo tras la caída del Imperio Romano?",
+          "options": [
+            "La falta de un poder central que protegiera",
+            "La sobrepoblación de las ciudades romanas",
+            "El exceso de moneda en circulación en Europa",
+            "La abundancia de tierras sin dueño conocido"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Por qué el feudo producía casi todo localmente?",
+          "options": [
+            "Porque el comercio lejano era inseguro y costoso",
+            "Porque los campesinos no conocían otros productos del mundo",
+            "Porque la iglesia prohibía el comercio",
+            "Porque el clima impedía los viajes"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué papel cumplía el señor como organizador de la producción?",
+          "options": [
+            "Combinaba tierra, trabajo y capital",
+            "Trabajaba la tierra junto a los siervos",
+            "Compraba alimentos en otras regiones",
+            "Recaudaba impuestos para el rey"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Por qué escaseaba la moneda en la Alta Edad Media?",
+          "options": [
+            "Porque el comercio lejano había decaído",
+            "Porque el rey había prohibido acuñar moneda",
+            "Porque los campesinos la usaban como adorno",
+            "Porque la iglesia la guardaba"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué costo de oportunidad enfrentaba un campesino al ponerse bajo la protección de un señor?",
+          "options": [
+            "Perder libertad de movimiento por seguridad",
+            "Perder su familia y sus animales",
+            "Pagar impuestos al rey en lugar de al señor",
+            "Abandonar la agricultura para dedicarse al comercio"
+          ],
+          "correct": 0,
+          "difficulty": 3
+        },
+        {
+          "q": "¿Por qué se puede afirmar que el feudalismo fue una respuesta adaptativa?",
+          "options": [
+            "Porque resolvió la inseguridad con lo disponible",
+            "Porque copió el modelo económico del Imperio Romano",
+            "Porque eliminó por completo la violencia",
+            "Porque creó el primer mercado global"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué habría ocurrido con un campesino que cultivara su tierra sin la protección de un señor?",
+          "options": [
+            "Habría sido vulnerable a invasiones y saqueos",
+            "Habría prosperado con el comercio libre",
+            "Habría pagado menos tributos",
+            "Habría podido vender sus cosechas en la ciudad cercana"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Por qué el trueque era una solución eficiente en el feudo?",
+          "options": [
+            "Porque permitía intercambiar sin necesidad de moneda",
+            "Porque los productos del feudo tenían el mismo valor siempre",
+            "Porque eliminaba la necesidad de trabajar",
+            "Porque el señor controlaba todos los precios"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Decadencia del sistema",
+      "description": "Todo sistema que fue racional puede dejar de serlo. En este último gimnasio analizarás cómo el comercio, las ciudades y la Peste Negra transformaron el mundo feudal.",
+      "questions": [
+        {
+          "q": "¿Qué efecto demográfico tuvo la Peste Negra en Europa?",
+          "options": [
+            "Redujo la población en aproximadamente un tercio",
+            "Aumentó la población por la mejora de la salud pública",
+            "No tuvo efectos en la población rural",
+            "Solo afectó a las ciudades italianas"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Por qué subieron los salarios tras la Peste Negra?",
+          "options": [
+            "Porque escaseaba la mano de obra disponible",
+            "Porque los señores se volvieron generosos",
+            "Porque el rey fijó salarios más altos",
+            "Porque aumentó la producción de alimentos en el campo"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué consecuencia trajo el regreso de la moneda a Europa?",
+          "options": [
+            "La riqueza dejó de depender solo de la tierra",
+            "Los feudos se volvieron más autosuficientes que antes",
+            "Los siervos perdieron poder de negociación",
+            "El trueque reemplazó a la moneda"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Por qué el feudalismo dejó de ser racional en el siglo XIV?",
+          "options": [
+            "Porque el comercio y la moneda ofrecían mejores alternativas",
+            "Porque los campesinos olvidaron las técnicas agrícolas antiguas",
+            "Porque el rey prohibió el vasallaje",
+            "Porque la iglesia compró todos los feudos"
+          ],
+          "correct": 0,
+          "difficulty": 3
+        },
+        {
+          "q": "¿Qué permitió a muchos campesinos comprar su libertad?",
+          "options": [
+            "El dinero del comercio y los salarios",
+            "Las tierras heredadas de sus padres",
+            "El apoyo militar del rey",
+            "La venta de sus herramientas al señor del feudo"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿La caída del feudalismo fue causada únicamente por la Peste Negra?",
+          "options": [
+            "No, también influyeron el comercio y las ciudades",
+            "Sí, la peste fue la única causa",
+            "No, la causa fue exclusivamente el cambio climático",
+            "Sí, pero solo en el sur de Europa"
+          ],
+          "correct": 0,
+          "difficulty": 3
+        },
+        {
+          "q": "¿Qué reacción tuvieron muchos señores ante la escasez de mano de obra?",
+          "options": [
+            "Fijaron salarios y limitaron la movilidad",
+            "Aumentaron los salarios voluntariamente",
+            "Entregaron sus tierras a los siervos",
+            "Abandonaron el campo para mudarse a las ciudades"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        },
+        {
+          "q": "¿Qué crisis se sumaron a la peste en el siglo XIV?",
+          "options": [
+            "Hambrunas y guerras prolongadas",
+            "Sequías y terremotos constantes",
+            "Epidemias de gripe y sarampión",
+            "Inundaciones y erupciones volcánicas"
+          ],
+          "correct": 0,
+          "difficulty": 1
+        },
+        {
+          "q": "¿Por qué las ciudades en crecimiento debilitaron el poder de los señores feudales?",
+          "options": [
+            "Porque ofrecían libertad y trabajo sin el señor",
+            "Porque estaban gobernadas por los obispos",
+            "Porque dependían de la protección militar del señor",
+            "Porque producían solo para el feudo"
+          ],
+          "correct": 0,
+          "difficulty": 2
+        }
+      ]
+    }
+  ]
+};
+
+/* ═══════════ ROSTER 1BGU ═══════════ */
+const ROSTER = {
+  "1BGU A": [
+    "Alban Altamirano Ivanna Fernanda",
+    "Arteaga Plaza Maria Emilia",
+    "Bejar Jimenez Helena Victoria",
+    "Cadena Ruiz Abigail",
+    "Cardenas Astudillo Juan Alejandro",
+    "Carrillo Perez Miguel Adrian",
+    "Castillo Ramirez Marco Antonio",
+    "Chong Qui Peñafiel Maria Emilia",
+    "Del Salto Palacios Ma. Del Mar",
+    "Diaz Veliz Eduardo Antonio",
+    "Estrada Vera Ariana Isabel",
+    "Farfan León Luciana Sofía",
+    "Fernandez Gonzabay Amanda Annabella",
+    "Fiallos Bruno",
+    "Galefski Merino Alanis Belen",
+    "Garate Andrade Manuel Isaias",
+    "Leon Jorge",
+    "Medina Gomez Nicolas Martin",
+    "Medina Morejon Fabianna Nicole",
+    "Mohr Moscol Lucas Agustin",
+    "Moncada Pedro",
+    "Montiel Cedeño Ruth Paulette",
+    "Navia Alcivar Miguel Ivan",
+    "Salazar Campuzano Thelmo Samuel",
+    "Vargas Carvajal Matias Adrian"
+  ],
+  "1BGU B": [
+    "Aguilar Banchon Felipe Santiago",
+    "Cardenas Vasquez Valentina Raphaela",
+    "Darquea Guerrero Isabella",
+    "Dvorquez Saman Eitan",
+    "Encalada Zambrano Patrick Olivier",
+    "Flores Sanchez Valentina",
+    "Garcés Cabezas Doménica Isabella",
+    "Gonzalez Lopez Isabella Alejandra",
+    "Gonzalez Velasco Estefanía",
+    "Hidalgo Drouet Samantha",
+    "Hoyos Espin Amanda Lia",
+    "Labre Galarza Rafaella",
+    "Moscoso Martinez Alicia Maria",
+    "Mueckay Salvatierra Lucas Xavier",
+    "Naht Muñoz Domenica Antonella",
+    "Naranjo Ojeda Maiha",
+    "Ortiz Cabrera Dylan Antonio",
+    "Rodriguez Ruiz Danna Valeria",
+    "Santa Cruz Cerón Mattías Niccolo",
+    "Solorzano Sebastian",
+    "Tapia Garzon Andres Jesus",
+    "Vallejo Herdoiza Nicolás Andres",
+    "Wendt Landivar Nathalie Fabiana",
+    "Zambrano Moreira Maria Victoria",
+    "Zapatier Perez Leonardo"
+  ],
+  "1BGU C": [
+    "Alava Ponce Isabella Edith",
+    "Alvarado Ricardo",
+    "Bonilla Chavarria Juan Diego",
+    "Celleri Ramirez Felipe Alejandro",
+    "Chacon Reyes Belen Alejandra",
+    "Cruz Pineda Domenica Alejandra",
+    "De La Cuadra Garces Eileen Alba",
+    "Encalada Zambrano Suri Polette",
+    "Garcia Velez Grace Valentina",
+    "Gavilanez Wilson",
+    "Giler Cañarte Lucciana Isabelle",
+    "Martinez Velasquez Wladimir Alejandro",
+    "Morales Flores Emilio Alejandro",
+    "Oliveira Yepez Eliane Anneliese",
+    "Palacios Recalde Eduardo Andres",
+    "Quimi Cedillo Krystell Lisset",
+    "Reina Sanchez Nishma Valentina",
+    "Rivadeneira Luzardo Amanda Lucia",
+    "Rivera Tinoco Alexa Maria",
+    "Toledo Castillo Roberto Sebastian",
+    "Trujillo Haillard Pepo Timothee",
+    "Vera Giler Darmin Matias",
+    "Vélez Zambrano Samuel Enrique",
+    "Ycaza Montjoy Ricardo Xavier"
+  ]
+};
+
+/* ═══════════ CONFIG ═══════════ */
+const EXAM_ID = 'feudal-quest-1bgu';
+const SUPABASE_URL = 'https://iitjrrnndfxqjzkggtog.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_90BfL8Ncg9WyceCdTE5Wzg_9kj14ubv';
+const SUPABASE_CONFIGURED = SUPABASE_URL.indexOf('tu-proyecto') === -1 && SUPABASE_ANON_KEY.indexOf('tu-anon-key') === -1 && SUPABASE_URL.indexOf('PEGAR') === -1 && SUPABASE_ANON_KEY.indexOf('PEGAR') === -1;
+const TEACHER_KEY = 'DOCENTE2026';
+const QUESTIONS_PER_GYM = 5;
+const PLAYER_HP = 100;
+const RIVAL_HP = 80;
+const DAMAGE = {1:20, 2:30, 3:40};
+const POINTS_PER_QUESTION = 0.4; /* 25 preguntas, nota sobre 10 */
+const MAX_GYM_RETRIES = 10; /* intentos máximos por gimnasio */
+const LS_KEY = 'feudal_quest_results';
+const LETTERS = ['A','B','C','D'];
+
+/* ═══════════ CRIATURAS (originales) ═══════════ */
+const CREATURES = {
+  buho:   {name:'Sir Búho',      emoji:'🦉', desc:'El sabio del feudo, que estudia cada pregunta antes de atacar.', hp:PLAYER_HP},
+  rana:   {name:'Caballero Rana', emoji:'🐸', desc:'El saltarín de la reserva señorial, ágil y veloz.', hp:PLAYER_HP},
+  dragon: {name:'Dragón del Feudo', emoji:'🐉', desc:'El guardián del castillo, imponente y leal.', hp:PLAYER_HP}
+};
+
+/* ═══════════ LÍDERES DE GIMNASIO ═══════════ */
+const GYM_LEADERS = {
+  1: {leader:'Barón Rígido',        creature:'Grifo del Vasallaje',   emoji:'🦅'},
+  2: {leader:'Señora de la Cosecha',creature:'Jabalí del Molino',     emoji:'🐗'},
+  3: {leader:'Conde del Pacto',     creature:'Lobo del Juramento',    emoji:'🐺'},
+  4: {leader:'Economista del Feudo',creature:'Zorro del Trueque',     emoji:'🦊'},
+  5: {leader:'Duque del Ocaso',     creature:'Murciélago de la Peste',emoji:'🦇'}
+};
+
+/* ═══════════ SUPABASE HELPERS ═══════════ */
+function supabaseHeaders(){
+  return { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer '+SUPABASE_ANON_KEY, 'Content-Type': 'application/json' };
+}
+function supabaseGet(path){
+  return fetch(SUPABASE_URL+'/rest/v1/'+path, { headers: supabaseHeaders(), cache: 'no-store' });
+}
+function supabaseSend(path, method, body, prefer){
+  const h = supabaseHeaders();
+  if(prefer) h['Prefer'] = prefer;
+  return fetch(SUPABASE_URL+'/rest/v1/'+path, { method: method, headers: h, body: body ? JSON.stringify(body) : undefined });
+}
+
+/* ═══════════ UTILIDADES ═══════════ */
+function $(id){ return document.getElementById(id); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function shuffleWithOptions(opts, correctIdx){
+  const order = shuffle(opts.map((_,i)=>i));
+  return {
+    options: order.map(i=>opts[i]),
+    answerIdx: order.indexOf(correctIdx)
+  };
+}
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function normalizeName(s){ return s.toUpperCase().trim().replace(/\s+/g,' '); }
+
+/* Separación de apellidos y nombres (formato del índice: APELLIDOS NOMBRES).
+   Regla práctica: 2 tokens = 1 apellido + 1 nombre; 3 tokens = 2 + 1;
+   4 tokens = 2 + 2; 5 tokens = 3 + 2; 6 o más = 3 + resto. */
+function parseName(fullName){
+  const tokens = fullName.trim().split(/\s+/);
+  let split = 2;
+  if(tokens.length <= 2) split = 1;
+  else if(tokens.length === 3) split = 2;
+  else if(tokens.length === 5) split = 3;
+  else if(tokens.length >= 6) split = 3;
+  else split = 2;
+  return {
+    lastname: tokens.slice(0, split).join(' '),
+    name: tokens.slice(split).join(' ')
+  };
+}
+
+/* ═══════════ ESTADO ═══════════ */
+const STATE = {
+  studentFullName:'', studentName:'', studentLastname:'', course:'',
+  creature:null,
+  gymIndex:0, questions:[], currentIndex:0,
+  shuffledAnswers:[], shuffledOptions:[],
+  answeredQuestions:[], gymStartIndex:0, correctTotalAtGymStart:0,
+  playerHp:PLAYER_HP, rivalHp:RIVAL_HP,
+  correctTotal:0, gymsBeaten:0, perGym:[],
+  gymRetries:MAX_GYM_RETRIES, /* intentos restantes del gimnasio actual */
+  penalidades:0, partidaTerminada:false, starting:false,
+  preguntasRespondidas: 0 /* contador de preguntas respondidas (máx 25) */
+};
+
+/* ═══════════ NAVEGACIÓN DE PANTALLAS ═══════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+
+/* ═══════════ ROSTER EN EL SELECT ═══════════ */
+function buildRoster(){
+  const sel = $('studentSelect');
+  Object.keys(ROSTER).forEach(curso=>{
+    const og = document.createElement('optgroup');
+    og.label = curso;
+    ROSTER[curso].forEach(nombre=>{
+      const op = document.createElement('option');
+      op.value = nombre;
+      op.textContent = nombre;
+      og.appendChild(op);
+    });
+    sel.appendChild(og);
+  });
+}
+
+/* ═══════════ SELECCIÓN DE CRIATURA ═══════════ */
+function buildCreatures(){
+  const grid = $('creatureGrid');
+  Object.keys(CREATURES).forEach(key=>{
+    const c = CREATURES[key];
+    const card = document.createElement('div');
+    card.className = 'creature-card';
+    card.dataset.key = key;
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    card.setAttribute('aria-label','Elegir '+c.name);
+    card.innerHTML =
+      '<div class="emoji">'+c.emoji+'</div>'+
+      '<div class="cname">'+c.name+'</div>'+
+      '<div class="cdesc">'+c.desc+'</div>'+
+      '<div class="chp">Vida: '+c.hp+'</div>';
+    card.addEventListener('click', ()=>selectCreature(key));
+    card.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); selectCreature(key); }
+    });
+    grid.appendChild(card);
+  });
+}
+function selectCreature(key){
+  STATE.creature = CREATURES[key];
+  document.querySelectorAll('.creature-card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.key===key);
+  });
+}
+
+/* ═══════════ GATE DE UN SOLO INTENTO ═══════════ */
+function getLocalRecords(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch(e){ return []; }
+}
+function recordMatches(rec, normFull){
+  const a = normalizeName(((rec.student_lastname||'')+' '+(rec.student_name||'')).trim());
+  const b = normalizeName(((rec.student_name||'')+' '+(rec.student_lastname||'')).trim());
+  const c = normalizeName(((rec.student_lastname||'')+', '+(rec.student_name||'')).trim());
+  return a===normFull || b===normFull || c===normFull;
+}
+function hasCompletedAttempt(fullName){
+  const norm = normalizeName(fullName);
+  if(SUPABASE_CONFIGURED){
+    return supabaseGet('quiz_results?exam_id=eq.'+EXAM_ID+'&select=student_name,student_lastname,grade,score,total,timestamp,answers')
+      .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(rows=>{
+        const found = rows.find(r=>recordMatches(r, norm));
+        return found ? found : null;
+      })
+      .catch(()=>{
+        return getLocalRecords().find(r=>recordMatches(r, norm)) || null;
+      });
+  }
+  return Promise.resolve(getLocalRecords().find(r=>recordMatches(r, norm)) || null);
+}
+
+/* ═══════════ INICIO ═══════════ */
+function startGame(){
+  if(STATE.starting) return;
+  const sel = $('studentSelect');
+  const errorEl = $('nameError');
+  const fullName = sel.value.trim();
+  if(!fullName){
+    errorEl.innerHTML = 'Elige tu nombre de la lista para comenzar.';
+    errorEl.classList.add('show');
+    sel.focus();
+    return;
+  }
+  if(!STATE.creature){
+    errorEl.innerHTML = 'Elige tu criatura inicial para comenzar.';
+    errorEl.classList.add('show');
+    return;
+  }
+  errorEl.classList.remove('show');
+  STATE.starting = true;
+  $('btnStart').disabled = true;
+
+  hasCompletedAttempt(fullName).then(prev=>{
+    STATE.starting = false;
+    $('btnStart').disabled = false;
+    if(prev){
+      const fecha = prev.timestamp ? new Date(prev.timestamp).toLocaleString('es-EC') : 'fecha desconocida';
+      const nota = Number(prev.grade||prev.score_10||0).toFixed(1);
+      const aciertos = prev.score||prev.correct||0;
+      const total = prev.total||25;
+      errorEl.innerHTML = 'Ya completaste Feudal Quest. Tu nota fue <strong>'+nota+'</strong> sobre 10 ('+aciertos+' de '+total+' aciertos), registrada el '+fecha+'. Solo se permite un intento por estudiante.';
+      errorEl.classList.add('show');
+      return;
+    }
+    launchGame(fullName);
+  });
+}
+
+function launchGame(fullName){
+  STATE.studentFullName = fullName;
+  const parsed = parseName(fullName);
+  STATE.studentLastname = parsed.lastname;
+  STATE.studentName = parsed.name;
+  const og = $('studentSelect').selectedOptions[0];
+  STATE.course = og && og.parentNode ? og.parentNode.label : '1BGU';
+  STATE.gymIndex = 0;
+  STATE.correctTotal = 0;
+  STATE.gymsBeaten = 0;
+  STATE.perGym = [];
+  STATE.penalidades = 0;
+  STATE.partidaTerminada = false;
+  STATE.answeredQuestions = [];
+  setupGym();
+}
+
+/* ═══════════ GIMNASIO ═══════════ */
+function setupGym(resetRetries){
+  const gym = QUESTION_BANK.gyms[STATE.gymIndex];
+  STATE.questions = shuffle(gym.questions).slice(0, QUESTIONS_PER_GYM);
+  STATE.currentIndex = 0;
+  STATE.gymStartIndex = STATE.answeredQuestions.length;
+  STATE.correctTotalAtGymStart = STATE.correctTotal;
+  if(resetRetries !== false) STATE.gymRetries = MAX_GYM_RETRIES;
+  STATE.playerHp = PLAYER_HP;
+  STATE.rivalHp = RIVAL_HP;
+  STATE.shuffledAnswers = new Array(STATE.questions.length).fill(null);
+  STATE.shuffledOptions = new Array(STATE.questions.length).fill(null);
+
+  const leader = GYM_LEADERS[gym.id];
+  $('gymBadge').textContent = 'Gimnasio '+(STATE.gymIndex+1)+' de 5';
+  $('gymName').textContent = gym.name;
+  $('gymLeader').textContent = 'Líder: '+leader.leader+' · '+leader.creature;
+  $('playerEmoji').textContent = STATE.creature.emoji;
+  $('playerName').textContent = STATE.creature.name;
+  $('rivalEmoji').textContent = leader.emoji;
+  $('rivalName').textContent = leader.creature;
+  $('rivalRole').textContent = 'Líder del gimnasio';
+  updateHpBars();
+  showScreen('screen-battle');
+  renderQuestion();
+}
+
+function updateHpBars(){
+  const pPct = Math.max(0, Math.round(STATE.playerHp/PLAYER_HP*100));
+  const rPct = Math.max(0, Math.round(STATE.rivalHp/RIVAL_HP*100));
+  const pFill = $('playerHp'), rFill = $('rivalHp');
+  pFill.style.width = pPct+'%';
+  rFill.style.width = rPct+'%';
+  pFill.classList.toggle('low', pPct<=30);
+  rFill.classList.toggle('low', rPct<=30);
+  $('playerHpText').textContent = STATE.playerHp+' / '+PLAYER_HP;
+  $('rivalHpText').textContent = STATE.rivalHp+' / '+RIVAL_HP;
+}
+
+function renderQuestion(){
+  const q = STATE.questions[STATE.currentIndex];
+  const sh = shuffleWithOptions(q.options, q.correct);
+  STATE.shuffledAnswers[STATE.currentIndex] = sh.answerIdx;
+  STATE.shuffledOptions[STATE.currentIndex] = sh.options;
+
+  $('qProgress').textContent = 'Pregunta '+(STATE.currentIndex+1)+' de '+QUESTIONS_PER_GYM;
+  $('qText').textContent = q.q;
+  const optsWrap = $('options');
+  optsWrap.innerHTML = '';
+  sh.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = '<span class="letter">'+LETTERS[i]+'</span>'+escapeHtml(opt);
+    btn.addEventListener('click', ()=>handleAnswer(i));
+    optsWrap.appendChild(btn);
+  });
+  const fb = $('battleFeedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+}
+
+function showDamageFloat(targetId, amount, isPlayer){
+  const target = $(targetId);
+  const el = document.createElement('div');
+  el.className = 'damage-float'+(isPlayer ? ' heal' : '');
+  el.textContent = (isPlayer ? '+' : '-')+amount;
+  target.appendChild(el);
+  setTimeout(()=>el.remove(), 1100);
+}
+
+function handleAnswer(selectedIdx){
+  const q = STATE.questions[STATE.currentIndex];
+  const correctIdx = STATE.shuffledAnswers[STATE.currentIndex];
+  const opts = STATE.shuffledOptions[STATE.currentIndex];
+  const fb = $('battleFeedback');
+  const optionBtns = $('options').querySelectorAll('.option');
+
+  optionBtns.forEach((b,i)=>{
+    b.disabled = true;
+    if(i===correctIdx) b.classList.add('correct');
+    if(i===selectedIdx && selectedIdx!==correctIdx) b.classList.add('wrong');
+  });
+
+  const dmg = DAMAGE[q.difficulty] || 20;
+  const isCorrect = selectedIdx === correctIdx;
+
+  STATE.answeredQuestions.push({
+    q: q.q, options: opts, correctIdx: correctIdx, selectedIdx: selectedIdx,
+    difficulty: q.difficulty, ok: isCorrect
+  });
+
+  if(isCorrect){
+    STATE.correctTotal++;
+    STATE.rivalHp = Math.max(0, STATE.rivalHp - dmg);
+    showDamageFloat('rivalFighter', dmg, false);
+    fb.className = 'feedback show ok';
+    fb.textContent = '¡Correcto! Tu criatura ataca con '+dmg+' de daño.';
+  } else {
+    STATE.playerHp = Math.max(0, STATE.playerHp - dmg);
+    showDamageFloat('playerFighter', dmg, true);
+    fb.className = 'feedback show bad';
+    fb.textContent = 'Incorrecto. El rival te ataca con '+dmg+' de daño.';
+  }
+  updateHpBars();
+
+  setTimeout(()=>{
+    if(STATE.playerHp <= 0){
+      /* El rival derrotó a tu criatura: derrota inmediata */
+      endGym(false);
+    } else if(STATE.currentIndex < QUESTIONS_PER_GYM-1){
+      STATE.currentIndex++;
+      renderQuestion();
+    } else {
+      /* 5 preguntas respondidas: el gimnasio se decide por el HP del rival */
+      endGym(STATE.rivalHp <= 0);
+    }
+  }, 950);
+}
+
+function endGym(win){
+  const gym = QUESTION_BANK.gyms[STATE.gymIndex];
+  /* Aciertos de este gimnasio: desde el índice donde empezó hasta ahora */
+  const gymCorrect = STATE.answeredQuestions.slice(STATE.gymStartIndex).filter(a=>a.ok).length;
+
+  if(win){
+    STATE.gymsBeaten++;
+    STATE.perGym.push({gym: gym.id, name: gym.name, correct: gymCorrect, total: QUESTIONS_PER_GYM});
+    $('gvCorrect').textContent = gymCorrect;
+    $('gvTotal').textContent = QUESTIONS_PER_GYM;
+    $('gvGyms').textContent = STATE.gymsBeaten;
+    $('gymVictoryTitle').textContent = '¡Gimnasio vencido!';
+    $('gymVictorySub').textContent = 'Venciste a '+GYM_LEADERS[gym.id].leader+' y a su '+GYM_LEADERS[gym.id].creature+'.';
+    showScreen('screen-gym-victory');
+  } else {
+    STATE.gymRetries--;
+    if(STATE.gymRetries <= 0){
+      /* Se agotaron los intentos de este gimnasio: la partida termina con nota parcial */
+      endGame();
+      return;
+    }
+    $('dfCorrect').textContent = gymCorrect;
+    $('dfTotal').textContent = QUESTIONS_PER_GYM;
+    $('dfGyms').textContent = STATE.gymsBeaten;
+    $('defeatSub').textContent = GYM_LEADERS[gym.id].creature+' venció a tu criatura en el gimnasio '+gym.name+'.';
+    $('defeatRetries').textContent = 'Intentos restantes: '+STATE.gymRetries+' de '+MAX_GYM_RETRIES+'. Las preguntas cambiarán.';
+    showScreen('screen-defeat');
+  }
+}
+
+function nextGym(){
+  if(STATE.gymIndex < QUESTION_BANK.gyms.length-1){
+    STATE.gymIndex++;
+    setupGym();
+  } else {
+    endGame();
+  }
+}
+
+function retryGym(){
+  /* Descartar el intento fallido: ni sus respuestas ni sus aciertos cuentan */
+  STATE.answeredQuestions = STATE.answeredQuestions.slice(0, STATE.gymStartIndex);
+  STATE.correctTotal = STATE.correctTotalAtGymStart;
+  setupGym(false); /* el reintento consume intentos: NO se resetea gymRetries */
+}
+
+/* ═══════════ FIN DEL JUEGO ═══════════ */
+function endGame(){
+  STATE.partidaTerminada = true;
+  const total = QUESTIONS_PER_GYM * QUESTION_BANK.gyms.length; /* 25 */
+  let nota = STATE.correctTotal * POINTS_PER_QUESTION;
+  const penal = STATE.penalidades || 0;
+  nota = Math.max(0, nota - penal);
+  nota = Math.round(nota*10)/10;
+
+  const campeon = STATE.gymsBeaten >= QUESTION_BANK.gyms.length;
+  $('finalEmoji').textContent = campeon ? '👑' : '🏁';
+  $('finalTitle').textContent = campeon ? '¡Eres campeón de Feudal Quest!' : 'Partida terminada';
+  $('finalSub').textContent = campeon
+    ? 'Venciste a los cinco líderes de los gimnasios del feudo.'
+    : 'Venciste '+STATE.gymsBeaten+' de '+QUESTION_BANK.gyms.length+' gimnasios.';
+
+  $('finalGrade').textContent = nota.toFixed(1);
+  $('finCorrect').textContent = STATE.correctTotal;
+  $('finGyms').textContent = STATE.gymsBeaten;
+  $('finPenal').textContent = penal.toFixed(1);
+  $('saveStatus').textContent = '';
+  $('reviewBox').style.display = 'none';
+  $('btnToggleReview').textContent = 'Ver revisión de respuestas';
+  buildReview();
+  showScreen('screen-victory');
+  saveResult(nota, penal);
+}
+
+function buildReview(){
+  const wrong = STATE.answeredQuestions.filter(a=>!a.ok);
+  const box = $('reviewBox');
+  if(!wrong.length){
+    box.innerHTML = '<p style="color:var(--green);font-weight:600;">Respondiste todas las preguntas correctamente. Excelente trabajo.</p>';
+    return;
+  }
+  let html = '<h3 style="margin-bottom:10px;">Preguntas con error ('+wrong.length+')</h3>';
+  wrong.forEach(a=>{
+    html += '<div class="review-item">'+
+      '<div class="rq">'+escapeHtml(a.q)+'</div>'+
+      '<div class="ra"><span class="tag yours">Tu respuesta: </span>'+escapeHtml(a.options[a.selectedIdx])+'</div>'+
+      '<div class="ra"><span class="tag right">Correcta: </span>'+escapeHtml(a.options[a.correctIdx])+'</div>'+
+      '</div>';
+  });
+  box.innerHTML = html;
+}
+
+/* ═══════════ GUARDADO (Supabase + respaldo local) ═══════════ */
+function saveResult(nota, penal){
+  const sbRow = {
+    student_name: STATE.studentName,
+    student_lastname: STATE.studentLastname,
+    course: STATE.course,
+    exam_id: EXAM_ID,
+    score: STATE.correctTotal,
+    total: QUESTIONS_PER_GYM * QUESTION_BANK.gyms.length,
+    grade: parseFloat(nota),
+    timestamp: new Date().toISOString(),
+    attempt: 1,
+    answers: {
+      penalidades: penal,
+      gymsBeaten: STATE.gymsBeaten,
+      creature: STATE.creature.name,
+      perGym: STATE.perGym
+    }
+  };
+  const statusEl = $('saveStatus');
+  function saveLocalFallback(){
+    const recs = getLocalRecords();
+    recs.push(sbRow);
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(recs)); }catch(e){}
+    statusEl.className = 'save-status warn';
+    statusEl.textContent = 'Sin conexión con el servidor. Tu resultado se guardó solo en este dispositivo. Avísale al docente.';
+  }
+  if(!SUPABASE_CONFIGURED){
+    saveLocalFallback();
+    return;
+  }
+  supabaseSend('quiz_results', 'POST', sbRow)
+    .then(r=>{
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      statusEl.className = 'save-status ok';
+      statusEl.textContent = 'Resultado guardado correctamente.';
+    })
+    .catch(saveLocalFallback);
+}
+
+/* ═══════════ PENALIDAD POR SALIR DE PANTALLA ═══════════ */
+function showPenaltyToast(){
+  const toast = $('toast-penalidad');
+  toast.textContent = '⚠️ Penalidad -0.5 por cambiar de ventana · Total: -'+STATE.penalidades.toFixed(1);
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 3000);
+}
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){
+    const battleActive = $('screen-battle').classList.contains('active');
+    if(battleActive && !STATE.partidaTerminada){
+      STATE.penalidades += 0.5;
+    }
+  } else {
+    if(STATE.penalidades > 0 && !STATE.partidaTerminada){
+      showPenaltyToast();
+    }
+  }
+});
+
+/* ═══════════ PANEL DOCENTE ═══════════ */
+let teacherAuthenticated = false;
+let currentTeacherRows = [];
+
+function openTeacherModal(){
+  $('modal-teacher').hidden = false;
+  $('modal-teacher').classList.add('open');
+  if(teacherAuthenticated){
+    $('teacherLogin').style.display = 'none';
+    $('teacherPanel').style.display = 'block';
+    loadTeacher();
+  } else {
+    $('teacherLogin').style.display = 'block';
+    $('teacherPanel').style.display = 'none';
+    $('teacherKeyError').classList.remove('show');
+  }
+}
+function closeTeacherModal(){
+  $('modal-teacher').classList.remove('open');
+  $('modal-teacher').hidden = true;
+}
+function validateTeacherKey(){
+  const key = $('teacherKeyInput').value.trim();
+  const err = $('teacherKeyError');
+  if(key !== TEACHER_KEY){
+    err.innerHTML = 'Clave incorrecta.';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+  teacherAuthenticated = true;
+  $('teacherLogin').style.display = 'none';
+  $('teacherPanel').style.display = 'block';
+  loadTeacher();
+}
+function loadTeacher(){
+  const wrap = $('teacherTableWrap');
+  if(!SUPABASE_CONFIGURED){
+    currentTeacherRows = [];
+    wrap.innerHTML = '<p style="color:var(--red);text-align:center;padding:20px;">Supabase no está configurado. Revisa las credenciales.</p>';
+    return;
+  }
+  supabaseGet('quiz_results?exam_id=eq.'+EXAM_ID+'&select=*&order=timestamp.desc')
+    .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(rows=>{
+      currentTeacherRows = rows;
+      renderTeacherTable(rows);
+    })
+    .catch(()=>{
+      currentTeacherRows = [];
+      wrap.innerHTML = '<p style="color:var(--red);text-align:center;padding:20px;">Error de conexión con Supabase. Verifica que el proyecto esté activo.</p>';
+    });
+}
+function renderTeacherTable(rows){
+  const wrap = $('teacherTableWrap');
+  $('teacherCount').textContent = rows.length ? rows.length+' registro(s)' : '';
+  if(!rows.length){
+    wrap.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px;">No hay notas guardadas todavía.</p>';
+    return;
+  }
+  let html = '<table><thead><tr>'+
+    '<th>Nombre</th><th>Apellido</th><th>Curso</th><th>Correctas</th><th>Total</th>'+
+    '<th>Nota /10</th><th>Gimnasios</th><th>Penal.</th><th>Fecha</th><th></th>'+
+    '</tr></thead><tbody>';
+  rows.forEach((r,idx)=>{
+    const name = r.student_name||r.studentName||r.name||'';
+    const last = r.student_lastname||r.studentLastname||r.lastname||'';
+    const date = r.timestamp||r.created_at||'';
+    const dateStr = date ? new Date(date).toLocaleString('es-EC') : '-';
+    const ans = r.answers || {};
+    const gyms = ans.gymsBeaten != null ? ans.gymsBeaten : '-';
+    const penal = ans.penalidades != null ? Number(ans.penalidades).toFixed(1) : '-';
+    html += '<tr>'+
+      '<td>'+escapeHtml(name)+'</td>'+
+      '<td>'+escapeHtml(last)+'</td>'+
+      '<td>'+escapeHtml(r.course||'1BGU')+'</td>'+
+      '<td>'+(r.score||r.correct||0)+'</td>'+
+      '<td>'+(r.total||0)+'</td>'+
+      '<td><strong>'+Number(r.grade||r.score_10||0).toFixed(1)+'</strong></td>'+
+      '<td>'+gyms+'</td>'+
+      '<td>'+penal+'</td>'+
+      '<td>'+dateStr+'</td>'+
+      '<td style="white-space:nowrap;"><button class="btn btn-sm btn-danger" data-del="'+idx+'">Eliminar</button></td>'+
+      '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      const idx = parseInt(this.getAttribute('data-del'));
+      if(isNaN(idx)) return;
+      const row = currentTeacherRows[idx];
+      if(!row || !row.id){ return; }
+      armButton(this, ()=>{
+        supabaseSend('quiz_results?id=eq.'+row.id, 'DELETE')
+          .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); loadTeacher(); })
+          .catch(()=>{ loadTeacher(); });
+      });
+    });
+  });
+}
+function armButton(btn, fn){
+  if(btn.dataset.armed === '1'){
+    btn.dataset.armed = '0';
+    btn.textContent = 'Eliminar';
+    fn();
+    return;
+  }
+  btn.dataset.armed = '1';
+  btn.textContent = '¿Confirmar?';
+  setTimeout(()=>{
+    if(btn.dataset.armed === '1'){
+      btn.dataset.armed = '0';
+      btn.textContent = 'Eliminar';
+    }
+  }, 3000);
+}
+function clearAllGrades(){
+  const btn = $('btnClearAll');
+  armButton(btn, ()=>{
+    supabaseSend('quiz_results?exam_id=eq.'+EXAM_ID, 'DELETE')
+      .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); loadTeacher(); })
+      .catch(()=>{ loadTeacher(); });
+  });
+}
+function exportExcel(){
+  if(!currentTeacherRows.length){
+    const status = $('teacherCount');
+    status.textContent = 'No hay notas para exportar.';
+    return;
+  }
+  const header = ['Nombre','Apellido','Curso','Correctas','Total','Nota /10','Gimnasios','Penalidades','Fecha'];
+  const esc = v=>{ const s=String(v??''); return /[",\n;]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
+  const lines = [header.join(',')];
+  currentTeacherRows.forEach(r=>{
+    const ans = r.answers || {};
+    lines.push([
+      esc(r.student_name||r.studentName||r.name||''),
+      esc(r.student_lastname||r.studentLastname||r.lastname||''),
+      esc(r.course||'1BGU'),
+      r.score||r.correct||0,
+      r.total||0,
+      Number(r.grade||r.score_10||0).toFixed(1),
+      ans.gymsBeaten != null ? ans.gymsBeaten : '',
+      ans.penalidades != null ? Number(ans.penalidades).toFixed(1) : '',
+      esc(r.timestamp ? new Date(r.timestamp).toLocaleString('es-EC') : '')
+    ].join(','));
+  });
+  const csv = '\ufeff' + lines.join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'feudal_quest_calificaciones.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ═══════════ EVENTOS ═══════════ */
+$('btnStart').addEventListener('click', startGame);
+$('btnNextGym').addEventListener('click', nextGym);
+$('btnRetryGym').addEventListener('click', retryGym);
+$('btnToggleReview').addEventListener('click', function(){
+  const box = $('reviewBox');
+  const show = box.style.display === 'none';
+  box.style.display = show ? 'block' : 'none';
+  this.textContent = show ? 'Ocultar revisión de respuestas' : 'Ver revisión de respuestas';
+});
+$('teacherTrigger').addEventListener('click', openTeacherModal);
+$('btnCloseTeacher').addEventListener('click', closeTeacherModal);
+$('btnValidateKey').addEventListener('click', validateTeacherKey);
+$('teacherKeyInput').addEventListener('keydown', e=>{ if(e.key==='Enter') validateTeacherKey(); });
+$('btnExport').addEventListener('click', exportExcel);
+$('btnClearAll').addEventListener('click', clearAllGrades);
+$('modal-teacher').addEventListener('click', function(e){
+  if(e.target === this) closeTeacherModal();
+});
+
+/* ═══════════ INICIALIZACIÓN ═══════════ */
+buildRoster();
+buildCreatures();
+</script>
+</body>
+</html>
